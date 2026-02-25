@@ -3,6 +3,20 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
+import { duration, easing, scrollRevealProps, staggerContainer, staggerItem, transitions } from '@/lib/motion'
+
+/**
+ * Focus Areas Section
+ *
+ * Animation approach (Healthcare UX):
+ * - Scroll-triggered header reveal
+ * - Cards have subtle opacity fade based on distance from center
+ * - Card hover: gentle 4px lift (not 8px - too aggressive)
+ * - No spring physics (causes bounce) - use gentle easing instead
+ * - No icon rotation on hover (too playful)
+ * - Button hover: subtle, no scale animation
+ */
 
 const focusAreas = [
   {
@@ -71,14 +85,15 @@ const CARD_WIDTH = 360
 const GAP = 24
 
 export default function FocusAreasSection() {
+  const t = useTranslations('focusAreas')
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
-  const [cardStates, setCardStates] = useState<{ opacity: number; scale: number }[]>(
-    focusAreas.map(() => ({ opacity: 1, scale: 1 }))
+  const [cardOpacities, setCardOpacities] = useState<number[]>(
+    focusAreas.map(() => 1)
   )
 
-  const calculateCardStates = useCallback(() => {
+  const calculateCardOpacities = useCallback(() => {
     if (!scrollRef.current) return
 
     const container = scrollRef.current
@@ -86,7 +101,7 @@ export default function FocusAreasSection() {
     const containerCenter = containerRect.width / 2
     const cards = container.querySelectorAll('[data-card]')
 
-    const newStates: { opacity: number; scale: number }[] = []
+    const newOpacities: number[] = []
 
     cards.forEach((card) => {
       const cardRect = card.getBoundingClientRect()
@@ -97,19 +112,17 @@ export default function FocusAreasSection() {
       const visibleThreshold = (CARD_WIDTH + GAP) * 2
 
       let opacity = 1
-      let scale = 1
-
       if (distanceFromCenter > visibleThreshold) {
         const fadeDistance = distanceFromCenter - visibleThreshold
         const maxFadeDistance = CARD_WIDTH * 0.5
-        opacity = Math.max(0.05, 1 - (fadeDistance / maxFadeDistance) * 0.95)
-        scale = Math.max(0.85, 1 - (fadeDistance / maxFadeDistance) * 0.15)
+        // Gentler fade - minimum 0.4 opacity (not 0.05)
+        opacity = Math.max(0.4, 1 - (fadeDistance / maxFadeDistance) * 0.6)
       }
 
-      newStates.push({ opacity, scale })
+      newOpacities.push(opacity)
     })
 
-    setCardStates(newStates)
+    setCardOpacities(newOpacities)
   }, [])
 
   const checkScrollPosition = useCallback(() => {
@@ -122,8 +135,8 @@ export default function FocusAreasSection() {
     setCanScrollLeft(scrollLeft > 0)
     setCanScrollRight(scrollLeft < maxScroll - 1)
 
-    calculateCardStates()
-  }, [calculateCardStates])
+    calculateCardOpacities()
+  }, [calculateCardOpacities])
 
   useEffect(() => {
     const container = scrollRef.current
@@ -137,14 +150,12 @@ export default function FocusAreasSection() {
         const containerWidth = container.clientWidth
         const cardOffsetLeft = thirdCard.offsetLeft
         const cardWidth = thirdCard.offsetWidth
-        // Center the third card in the viewport
         const scrollPosition = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2)
         container.scrollLeft = scrollPosition
       }
       checkScrollPosition()
     }
 
-    // Small delay to ensure layout is complete
     requestAnimationFrame(scrollToThirdCard)
 
     container.addEventListener('scroll', checkScrollPosition, { passive: true })
@@ -168,28 +179,41 @@ export default function FocusAreasSection() {
 
   return (
     <section className="bg-white py-20 md:py-28 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+      {/* Header with scroll reveal */}
+      <motion.div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        {...scrollRevealProps}
+        variants={staggerContainer}
+      >
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-14">
           <div>
             {/* Tag */}
-            <div className="flex items-center gap-2 mb-5">
+            <motion.div
+              className="flex items-center gap-2 mb-5"
+              variants={staggerItem}
+            >
               <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
-              <span className="text-sm text-zinc-900">Our Focus Areas</span>
-            </div>
+              <span className="text-sm text-zinc-900">{t('tag')}</span>
+            </motion.div>
 
             {/* Heading */}
-            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15]">
-              Driving Change Across Africa
-            </h2>
+            <motion.h2
+              className="text-3xl md:text-4xl lg:text-[42px] font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15]"
+              variants={staggerItem}
+            >
+              {t('title')}
+            </motion.h2>
           </div>
 
-          {/* Subtext - right side on desktop */}
-          <p className="text-zinc-500 text-sm max-w-sm mt-4 lg:mt-8 lg:text-right">
-            Our strategic focus areas guide our mission to transform cancer care across the continent.
-          </p>
+          {/* Subtext */}
+          <motion.p
+            className="text-zinc-500 text-sm max-w-sm mt-4 lg:mt-8 lg:text-right"
+            variants={staggerItem}
+          >
+            {t('subtitle')}
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Carousel Container */}
       <div className="relative">
@@ -211,20 +235,17 @@ export default function FocusAreasSection() {
                 marginRight: index === focusAreas.length - 1 ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' : undefined,
               }}
               className="flex-shrink-0 w-[320px] md:w-[360px]"
-              animate={{
-                opacity: cardStates[index]?.opacity ?? 1,
-                scale: cardStates[index]?.scale ?? 1,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 30,
-              }}
+              animate={{ opacity: cardOpacities[index] ?? 1 }}
+              transition={transitions.default}
             >
+              {/* Card with gentle hover */}
               <motion.div
                 className="group relative bg-zinc-900 rounded-3xl overflow-hidden border-4 border-zinc-200 h-[480px] cursor-pointer"
-                whileHover={{ y: -8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileHover={{ y: -4 }}
+                transition={{
+                  duration: duration.fast,
+                  ease: easing.gentle,
+                }}
               >
                 {/* Background Image */}
                 <div className="absolute inset-0">
@@ -232,7 +253,7 @@ export default function FocusAreasSection() {
                     src={area.image}
                     alt={area.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover motion-slow group-hover:scale-[1.02]"
                   />
                   {/* Gradient Mask */}
                   <div
@@ -241,7 +262,7 @@ export default function FocusAreasSection() {
                       background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)'
                     }}
                   />
-                  {/* Color Overlay - green tint at bottom */}
+                  {/* Color Overlay */}
                   <div
                     className="absolute inset-0 bg-[#0F766E]/50"
                     style={{
@@ -252,21 +273,17 @@ export default function FocusAreasSection() {
 
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col">
-                  {/* Icon */}
-                  <motion.div
-                    className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white mb-4"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
+                  {/* Icon - no hover animation (too playful for healthcare) */}
+                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white mb-4">
                     {area.icon}
-                  </motion.div>
+                  </div>
 
-                  {/* Title - fixed height for 2 lines */}
+                  {/* Title */}
                   <h4 className="text-white text-xl font-semibold font-[family-name:var(--font-montserrat)] mb-2 leading-tight h-[52px] line-clamp-2">
                     {area.title}
                   </h4>
 
-                  {/* Description - fixed height for 2 lines */}
+                  {/* Description */}
                   <p className="text-zinc-300 text-sm leading-relaxed line-clamp-2 h-[40px]">
                     {area.description}
                   </p>
@@ -276,34 +293,28 @@ export default function FocusAreasSection() {
           ))}
         </div>
 
-        {/* Navigation Buttons */}
+        {/* Navigation Buttons - subtle hover, no scale */}
         <div className="flex justify-center gap-4 mt-8">
-          <motion.button
+          <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
-            className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-600 motion-fast hover:bg-zinc-100 hover:border-zinc-400 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Scroll left"
-            whileHover={canScrollLeft ? { scale: 1.1 } : {}}
-            whileTap={canScrollLeft ? { scale: 0.95 } : {}}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-          </motion.button>
-          <motion.button
+          </button>
+          <button
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
-            className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-600 motion-fast hover:bg-zinc-100 hover:border-zinc-400 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Scroll right"
-            whileHover={canScrollRight ? { scale: 1.1 } : {}}
-            whileTap={canScrollRight ? { scale: 0.95 } : {}}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </motion.button>
+          </button>
         </div>
       </div>
     </section>

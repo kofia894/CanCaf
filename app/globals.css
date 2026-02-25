@@ -199,3 +199,224 @@ h1, h2, h3, h4, h5, h6 {
     @apply bg-background text-foreground;
   }
 }
+
+/* =============================================================================
+   CanCAF Motion System - CSS Utilities
+   Healthcare-appropriate animations: calm, professional, trustworthy
+   ============================================================================= */
+
+/* Motion Variables */
+:root {
+  /* Timing */
+  --motion-duration-instant: 150ms;
+  --motion-duration-fast: 200ms;
+  --motion-duration-normal: 350ms;
+  --motion-duration-slow: 500ms;
+
+  /* Easing - Gentle deceleration curve */
+  --motion-ease-gentle: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* =============================================================================
+   Reduced Motion Support (WCAG Accessibility)
+   ============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep essential opacity transitions for usability */
+  .motion-safe-opacity {
+    transition: opacity var(--motion-duration-fast) var(--motion-ease-gentle) !important;
+  }
+}
+
+/* =============================================================================
+   Base Transition Utilities
+   ============================================================================= */
+
+/* Default transition - use for most interactive elements */
+.motion-base {
+  transition: all var(--motion-duration-normal) var(--motion-ease-gentle);
+}
+
+/* Fast micro-interactions */
+.motion-fast {
+  transition: all var(--motion-duration-fast) var(--motion-ease-gentle);
+}
+
+/* Slow content reveals */
+.motion-slow {
+  transition: all var(--motion-duration-slow) var(--motion-ease-gentle);
+}
+
+/* Specific property transitions */
+.motion-opacity {
+  transition: opacity var(--motion-duration-normal) var(--motion-ease-gentle);
+}
+
+.motion-transform {
+  transition: transform var(--motion-duration-normal) var(--motion-ease-gentle);
+}
+
+.motion-colors {
+  transition: color var(--motion-duration-fast) var(--motion-ease-gentle),
+              background-color var(--motion-duration-fast) var(--motion-ease-gentle),
+              border-color var(--motion-duration-fast) var(--motion-ease-gentle);
+}
+
+.motion-shadow {
+  transition: box-shadow var(--motion-duration-normal) var(--motion-ease-gentle);
+}
+
+/* =============================================================================
+   Hover Effects (Healthcare-appropriate: subtle, not distracting)
+   ============================================================================= */
+
+/* Button hover - subtle 2px lift */
+.hover-lift {
+  transition: transform var(--motion-duration-fast) var(--motion-ease-gentle),
+              box-shadow var(--motion-duration-fast) var(--motion-ease-gentle);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Card hover - gentle 4px lift with shadow */
+.hover-card {
+  transition: transform var(--motion-duration-normal) var(--motion-ease-gentle),
+              box-shadow var(--motion-duration-normal) var(--motion-ease-gentle);
+}
+
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* Link hover - subtle scale */
+.hover-scale {
+  transition: transform var(--motion-duration-fast) var(--motion-ease-gentle);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Tap/click feedback */
+.active-press:active {
+  transform: scale(0.98);
+}
+
+/* =============================================================================
+   Scroll-Triggered Animation Classes
+   Use with JavaScript intersection observer or motion library
+   ============================================================================= */
+
+/* Initial hidden state */
+.scroll-hidden {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+/* Visible/revealed state */
+.scroll-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-enter),
+              transform var(--motion-duration-slow) var(--motion-ease-enter);
+}
+
+/* Fade only (no movement) */
+.scroll-fade-hidden {
+  opacity: 0;
+}
+
+.scroll-fade-visible {
+  opacity: 1;
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-enter);
+}
+
+/* =============================================================================
+   Focus States (Accessibility)
+   ============================================================================= */
+
+/* Visible focus ring with smooth transition */
+.focus-ring {
+  transition: box-shadow var(--motion-duration-fast) var(--motion-ease-gentle),
+              outline var(--motion-duration-fast) var(--motion-ease-gentle);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* =============================================================================
+   Loading States
+   ============================================================================= */
+
+/* Gentle pulse for loading states */
+@keyframes gentle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-gentle-pulse {
+  animation: gentle-pulse 2s var(--motion-ease-gentle) infinite;
+}
+
+/* Skeleton loading shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 25%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* =============================================================================
+   Stagger Animation Delays
+   For sequential reveals (use sparingly)
+   ============================================================================= */
+
+.stagger-1 { transition-delay: 0ms; }
+.stagger-2 { transition-delay: 80ms; }
+.stagger-3 { transition-delay: 160ms; }
+.stagger-4 { transition-delay: 240ms; }
+.stagger-5 { transition-delay: 320ms; }
+
+/* =============================================================================
+   Hide scrollbar utility (for carousels)
+   ============================================================================= */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
