@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { duration, easing, scrollRevealProps, staggerContainer, staggerItem, transitions } from '@/lib/motion'
 
 /**
@@ -86,6 +86,9 @@ const GAP = 24
 
 export default function FocusAreasSection() {
   const t = useTranslations('focusAreas')
+  const locale = useLocale()
+  const isRTL = locale === 'ar'
+  const isRTLRef = useRef(isRTL)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -132,8 +135,18 @@ export default function FocusAreasSection() {
     const scrollLeft = container.scrollLeft
     const maxScroll = container.scrollWidth - container.clientWidth
 
-    setCanScrollLeft(scrollLeft > 0)
-    setCanScrollRight(scrollLeft < maxScroll - 1)
+    if (isRTLRef.current) {
+      // In RTL mode, scrollLeft can be negative (Firefox) or positive (Chrome/Safari)
+      // We need to handle both cases
+      const absScrollLeft = Math.abs(scrollLeft)
+      // Can scroll "left" (visually right in RTL) if not at the start
+      setCanScrollLeft(absScrollLeft < maxScroll - 1)
+      // Can scroll "right" (visually left in RTL) if not at the end
+      setCanScrollRight(absScrollLeft > 1)
+    } else {
+      setCanScrollLeft(scrollLeft > 0)
+      setCanScrollRight(scrollLeft < maxScroll - 1)
+    }
 
     calculateCardOpacities()
   }, [calculateCardOpacities])
@@ -146,12 +159,15 @@ export default function FocusAreasSection() {
     const scrollToThirdCard = () => {
       const cards = container.querySelectorAll('[data-card]')
       if (cards.length >= 3) {
-        const thirdCard = cards[2] as HTMLElement
+        // In RTL, we want to center from the other side
+        const rtl = isRTLRef.current
+        const targetIndex = rtl ? cards.length - 3 : 2
+        const targetCard = cards[targetIndex] as HTMLElement
         const containerWidth = container.clientWidth
-        const cardOffsetLeft = thirdCard.offsetLeft
-        const cardWidth = thirdCard.offsetWidth
+        const cardOffsetLeft = targetCard.offsetLeft
+        const cardWidth = targetCard.offsetWidth
         const scrollPosition = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2)
-        container.scrollLeft = scrollPosition
+        container.scrollLeft = rtl ? -scrollPosition : scrollPosition
       }
       checkScrollPosition()
     }
@@ -171,6 +187,8 @@ export default function FocusAreasSection() {
     if (!scrollRef.current) return
 
     const scrollAmount = CARD_WIDTH + GAP
+    // scrollBy with positive/negative values works correctly with dir="rtl"
+    // The browser handles the RTL direction automatically
     scrollRef.current.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth'
@@ -220,6 +238,7 @@ export default function FocusAreasSection() {
         {/* Scrollable Container */}
         <div
           ref={scrollRef}
+          dir={isRTL ? 'rtl' : 'ltr'}
           className="flex gap-6 overflow-x-auto scrollbar-hide"
           style={{
             scrollbarWidth: 'none',
@@ -231,8 +250,10 @@ export default function FocusAreasSection() {
               key={index}
               data-card
               style={{
-                marginLeft: index === 0 ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' : undefined,
-                marginRight: index === focusAreas.length - 1 ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' : undefined,
+                marginLeft: index === 0 && !isRTL ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' :
+                           index === focusAreas.length - 1 && isRTL ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' : undefined,
+                marginRight: index === focusAreas.length - 1 && !isRTL ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' :
+                            index === 0 && isRTL ? 'max(1rem, calc((100vw - 1280px) / 2 + 2rem))' : undefined,
               }}
               className="flex-shrink-0 w-[320px] md:w-[360px]"
               animate={{ opacity: cardOpacities[index] ?? 1 }}
@@ -247,13 +268,13 @@ export default function FocusAreasSection() {
                   ease: easing.gentle,
                 }}
               >
-                {/* Background Image */}
+                {/* Background Image - Black and white */}
                 <div className="absolute inset-0">
                   <Image
                     src={area.image}
                     alt={area.title}
                     fill
-                    className="object-cover motion-slow group-hover:scale-[1.02]"
+                    className="object-cover motion-slow group-hover:scale-[1.02] grayscale"
                   />
                   {/* Gradient Mask */}
                   <div
