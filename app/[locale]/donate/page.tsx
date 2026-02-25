@@ -10,11 +10,12 @@ export default async function DonatePage() {
   const t = await getTranslations('donate')
 
   return (
-    <div className="pt-[calc(2.5rem+4rem+3rem)]">
+    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
       <PageHero
         tag={t('tag')}
         title={t('title')}
         subtitle={t('subtitle')}
+        backgroundImage="/home/advocacy.webp"
       />
 
       {/* Content Section */}

@@ -25,13 +25,13 @@ export default function PageHero({
   tag,
   title,
   subtitle,
-  backgroundImage = '/home/hero.jpg',
+  backgroundImage = '/home/hero.webp',
 }: PageHeroProps) {
   return (
     <section className="relative h-[50vh] min-h-[400px] w-full bg-zinc-900">
-      {/* Background Image - blurred */}
+      {/* Background Image - blurred and grayscale */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 blur-sm"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 blur-sm grayscale"
         style={{
           backgroundImage: `url('${backgroundImage}')`,
         }}
@@ -91,7 +91,7 @@ export default function PageHero({
           {/* Subtitle */}
           {subtitle && (
             <motion.p
-              className="mt-5 text-base md:text-lg text-zinc-400 max-w-xl"
+              className="mt-5 text-base md:text-lg text-white/80 max-w-xl"
               initial={{
                 opacity: 0,
                 y: 15,

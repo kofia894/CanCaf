@@ -17,44 +17,45 @@ export default async function ProgramsPage() {
       tag: t('capacityBuildingTag'),
       title: t('capacityBuilding'),
       description: t('capacityBuildingDesc'),
-      image: '/home/hero.jpg',
+      image: '/home/capacitybuilding.webp',
     },
     {
       key: 'awareness',
       tag: t('awarenessTag'),
       title: t('awareness'),
       description: t('awarenessDesc'),
-      image: '/home/hero.jpg',
+      image: '/home/ealydetect.webp',
     },
     {
       key: 'earlyDetection',
       tag: t('earlyDetectionTag'),
       title: t('earlyDetection'),
       description: t('earlyDetectionDesc'),
-      image: '/home/hero.jpg',
+      image: '/home/excelincare.webp',
     },
     {
       key: 'advocacy',
       tag: t('advocacyTag'),
       title: t('advocacy'),
       description: t('advocacyDesc'),
-      image: '/home/hero.jpg',
+      image: '/home/advocacy.webp',
     },
     {
       key: 'partnerships',
       tag: t('partnershipsTag'),
       title: t('partnerships'),
       description: t('partnershipsDesc'),
-      image: '/home/hero.jpg',
+      image: '/home/innandresearch.webp',
     },
   ]
 
   return (
-    <div className="pt-[calc(2.5rem+4rem+3rem)]">
+    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
       <PageHero
         tag={t('tag')}
         title={t('title')}
         subtitle={t('subtitle')}
+        backgroundImage="/home/capacitybuilding.webp"
       />
 
       {/* Content Section */}

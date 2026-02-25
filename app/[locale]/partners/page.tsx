@@ -20,21 +20,22 @@ export default async function PartnersPage() {
   ]
 
   return (
-    <div className="pt-[calc(2.5rem+4rem+3rem)]">
+    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
       <PageHero
         tag={t('tag')}
         title={t('title')}
         subtitle={t('subtitle')}
+        backgroundImage="/home/innandresearch.webp"
       />
 
       {/* Bento Grid Section */}
-      <section className="py-20 md:py-28 bg-zinc-100">
+      <section className="py-12 md:py-20 lg:py-28 bg-zinc-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-fr">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:auto-rows-fr">
             {/* Left - Large Image Card */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/5] lg:aspect-auto lg:row-span-2">
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:row-span-2">
               <Image
-                src="/home/hero.jpg"
+                src="/partners/collabgridimg1.webp"
                 alt="Partnership Impact"
                 fill
                 className="object-cover"
@@ -52,9 +53,9 @@ export default async function PartnersPage() {
             </div>
 
             {/* Middle Column - Two Content Cards */}
-            <div className="flex flex-col gap-6 lg:row-span-2">
+            <div className="flex flex-col gap-4 lg:gap-6 lg:row-span-2">
               {/* Policy & Advocacy Card */}
-              <div className="bg-white rounded-3xl p-8 md:p-10 border border-zinc-200 flex-1 flex flex-col justify-center">
+              <div className="bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-zinc-200 lg:flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-2 mb-5">
                   <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
                   <span className="text-sm text-zinc-500 font-medium">{t('policyTag')}</span>
@@ -68,7 +69,7 @@ export default async function PartnersPage() {
               </div>
 
               {/* Systems Strengthening Card */}
-              <div className="bg-white rounded-3xl p-8 md:p-10 border border-zinc-200 flex-1 flex flex-col justify-center">
+              <div className="bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-zinc-200 lg:flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-2 mb-5">
                   <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
                   <span className="text-sm text-zinc-500 font-medium">{t('systemsTag')}</span>
@@ -83,11 +84,11 @@ export default async function PartnersPage() {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-col gap-6 lg:row-span-2">
+            <div className="flex flex-col gap-4 lg:gap-6 lg:row-span-2">
               {/* Small Image */}
               <div className="relative rounded-3xl overflow-hidden aspect-[4/3]">
                 <Image
-                  src="/home/hero.jpg"
+                  src="/partners/collabgridimg2.webp"
                   alt="Collaboration"
                   fill
                   className="object-cover"
@@ -95,7 +96,7 @@ export default async function PartnersPage() {
               </div>
 
               {/* CTA Card */}
-              <div className="bg-zinc-900 rounded-3xl p-6 md:p-8 flex flex-col justify-between flex-1">
+              <div className="bg-zinc-900 rounded-3xl p-6 md:p-8 flex flex-col justify-between lg:flex-1">
                 <div>
                   <p className="text-white text-lg leading-relaxed mb-4">
                     {t('joinUs')}
@@ -123,7 +124,7 @@ export default async function PartnersPage() {
       </section>
 
       {/* Partner With Us Section */}
-      <section className="py-20 md:py-28 bg-zinc-100">
+      <section className="py-12 md:py-20 lg:py-28 bg-zinc-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-10">
@@ -144,7 +145,7 @@ export default async function PartnersPage() {
           {/* Partner Types Card */}
           <div className="relative rounded-3xl overflow-hidden">
             <Image
-              src="/home/hero.jpg"
+              src="/partners/welcomepartners.webp"
               alt="Partnership"
               fill
               className="object-cover"

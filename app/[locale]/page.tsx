@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero section - pt accounts for fixed navbar height */}
-      <div className="pt-[126px] lg:pt-[176px]">
+      <div className="pt-[110px] lg:pt-[176px]">
         <Hero />
       </div>
 

@@ -22,11 +22,12 @@ export default async function AboutPage() {
   ]
 
   return (
-    <div className="pt-[calc(2.5rem+4rem+3rem)]">
+    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
       <PageHero
         tag={t('tag')}
         title={t('title')}
         subtitle={t('subtitle')}
+        backgroundImage="/home/home2.webp"
       />
 
       {/* Mission Section */}
@@ -51,7 +52,7 @@ export default async function AboutPage() {
             <div className="relative">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/home/hero.jpg"
+                  src="/about/mission.webp"
                   alt={t('mission')}
                   fill
                   className="object-cover"
@@ -70,7 +71,7 @@ export default async function AboutPage() {
             <div className="relative order-2 lg:order-1">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/home/hero.jpg"
+                  src="/about/qualityhealthcare.webp"
                   alt={t('vision')}
                   fill
                   className="object-cover"
@@ -201,7 +202,7 @@ export default async function AboutPage() {
             <div className="relative">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/home/hero.jpg"
+                  src="/about/accrossafrica.webp"
                   alt={t('whereWeWork')}
                   fill
                   className="object-cover"

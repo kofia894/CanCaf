@@ -85,7 +85,7 @@ export default function AboutSection() {
           >
             <div className="rounded-2xl overflow-hidden border border-zinc-200">
               <Image
-                src="/home/hero.jpg"
+                src="/home/home2.webp"
                 alt="Community gathering in Africa"
                 width={600}
                 height={400}
