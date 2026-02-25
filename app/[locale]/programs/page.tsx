@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Link } from '@/i18n/routing'
 import PageHero from '../../components/PageHero'
 
 export const metadata = {
@@ -92,17 +91,9 @@ export default async function ProgramsPage() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-zinc-600 leading-relaxed mb-6">
+                  <p className="text-zinc-600 leading-relaxed">
                     {program.description}
                   </p>
-
-                  {/* Button */}
-                  <Link
-                    href="/programs"
-                    className="inline-flex items-center justify-center w-fit px-6 py-3 border border-zinc-900 text-zinc-900 rounded-full text-sm font-medium motion-fast hover:bg-zinc-900 hover:text-white"
-                  >
-                    {t('learnMore')}
-                  </Link>
                 </div>
               </div>
             ))}
