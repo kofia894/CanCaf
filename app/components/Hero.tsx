@@ -105,7 +105,7 @@ export default function Hero() {
               {t('cta')}
             </Link>
             <Link
-              href="/programs"
+              href="/donate"
               className="inline-flex items-center justify-center px-6 py-3 bg-[#F59E0B] text-white rounded-md text-sm font-medium motion-fast hover:bg-[#D4A017] hover:-translate-y-0.5 active:scale-[0.98]"
             >
               {t('ctaSecondary')}
