@@ -6,10 +6,8 @@ import ImpactStatsSection from "../components/ImpactStatsSection";
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero section - pt accounts for fixed navbar height */}
-      <div className="pt-[110px] lg:pt-[176px]">
-        <Hero />
-      </div>
+      {/* Hero section - full bleed, navbar overlays on top */}
+      <Hero />
 
       {/* About Section */}
       <AboutSection />

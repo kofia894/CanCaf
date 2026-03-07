@@ -55,7 +55,7 @@ export default function CGCPOnAfricaPage() {
   }
 
   return (
-    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
+    <div>
       {/* Hero Section */}
       <section className="relative h-[70vh] min-h-[550px] w-full bg-zinc-900">
         <div

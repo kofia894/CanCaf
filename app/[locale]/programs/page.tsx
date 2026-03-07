@@ -51,7 +51,7 @@ export default async function ProgramsPage() {
   ]
 
   return (
-    <div className="pt-20 md:pt-[calc(2.5rem+4rem+3rem)]">
+    <div>
       <PageHero
         tag={t('tag')}
         title={t('title')}

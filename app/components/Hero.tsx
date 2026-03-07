@@ -22,7 +22,7 @@ export default function Hero() {
   const tCgcp = useTranslations('cgcpOnAfrica')
 
   return (
-    <section className="relative h-[80vh] min-h-[450px] w-full">
+    <section className="relative h-screen min-h-[600px] w-full">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -30,13 +30,13 @@ export default function Hero() {
           backgroundImage: "url('/home/hero.webp')",
         }}
       >
-        {/* Gradient Overlay - teal gradient for brand consistency */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000000]/100 via-[#000000]/40 to-transparent" />
+        {/* Gradient Overlay - darker for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
       </div>
 
       {/* Programme Announcement - Slide-in Toast */}
       <motion.div
-        className="absolute top-6 end-4 md:top-10 md:end-8 z-10 max-w-sm"
+        className="absolute top-56 end-4 md:top-64 md:end-8 z-10 max-w-sm"
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: heroEasing, delay: 0.8 }}
