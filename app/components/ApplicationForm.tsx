@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { submitApplication } from '@/app/actions/submitApplication'
 
 /**
  * Multi-Step Application Form
@@ -182,10 +184,77 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    // Simulate API call - replace with actual submission logic
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+
+    try {
+      const result = await submitApplication(
+        {
+          // Section A
+          fullName: formData.fullName,
+          gender: formData.gender,
+          dateOfBirth: formData.dateOfBirth,
+          nationality: formData.nationality,
+          countryOfResidence: formData.countryOfResidence,
+          currentInstitution: formData.currentInstitution,
+          department: formData.department,
+          currentPosition: formData.currentPosition,
+          yearsOncologyExperience: formData.yearsOncologyExperience,
+          professionalRegistrationNumber: formData.professionalRegistrationNumber,
+          email: formData.email,
+          phone: formData.phone,
+          // Section B
+          nursingQualification: formData.nursingQualification,
+          nursingQualificationOther: formData.nursingQualificationOther,
+          qualificationInstitution: formData.qualificationInstitution,
+          yearCompleted: formData.yearCompleted,
+          oncologyTraining: formData.oncologyTraining,
+          areasOfPractice: formData.areasOfPractice,
+          areaOfPracticeOther: formData.areaOfPracticeOther,
+          priorGeneticsTraining: formData.priorGeneticsTraining,
+          geneticsTrainingDetails: formData.geneticsTrainingDetails,
+          // Section C
+          interestReason: formData.interestReason,
+          benefitDescription: formData.benefitDescription,
+          counselingExperience: formData.counselingExperience,
+          // Section D
+          institutionName: formData.institutionName,
+          supervisorName: formData.supervisorName,
+          supervisorPosition: formData.supervisorPosition,
+          supervisorContact: formData.supervisorContact,
+          // Section E
+          canParticipateVirtually: formData.canParticipateVirtually,
+          hasReliableInternet: formData.hasReliableInternet,
+          // Section G
+          declarationAgreed: formData.declarationAgreed,
+          applicantSignatureName: formData.applicantSignatureName,
+          signatureDate: formData.signatureDate,
+        },
+        {
+          cvFile: formData.cvFile,
+          statementOfInterestFile: formData.statementOfInterestFile,
+          professionalLicenseFile: formData.professionalLicenseFile,
+          institutionalSupportLetterFile: formData.institutionalSupportLetterFile,
+          supportLetterFile: formData.supportLetterFile,
+        }
+      )
+
+      if (result.success) {
+        toast.success('Application submitted successfully!', {
+          description: 'We will review your application and get back to you soon.',
+        })
+        setIsSubmitted(true)
+      } else {
+        toast.error('Submission failed', {
+          description: result.message || 'Failed to submit application. Please try again.',
+        })
+      }
+    } catch (error) {
+      console.error('Submission error:', error)
+      toast.error('An error occurred', {
+        description: 'Something went wrong while submitting. Please try again.',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const stepVariants = {
@@ -200,60 +269,109 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
   const checkboxClasses = "w-4 h-4 rounded border-zinc-300 text-[#0F766E] focus:ring-[#0F766E] focus:ring-offset-0"
   const sectionHeaderClasses = "text-lg font-bold text-zinc-900 uppercase tracking-wide"
 
+  // File validation constants
+  const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2 MB
+  const ALLOWED_FILE_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/jpg',
+  ]
+  const ALLOWED_EXTENSIONS = '.pdf, .doc, .docx, .jpg, .jpeg'
+
+  const validateFile = (file: File): { valid: boolean; error?: string } => {
+    if (file.size > MAX_FILE_SIZE) {
+      return { valid: false, error: `File size must be less than 2 MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)} MB.` }
+    }
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      return { valid: false, error: `Invalid file type. Accepted formats: PDF, DOC, DOCX, JPG, JPEG` }
+    }
+    return { valid: true }
+  }
+
   // File Upload Component
   const FileUpload = ({
     label,
     file,
     inputRef,
     onChange,
-    accept = ".pdf,.doc,.docx"
   }: {
     label: string
     file: File | null
     inputRef: React.RefObject<HTMLInputElement | null>
     onChange: (file: File | null) => void
-    accept?: string
-  }) => (
-    <div className="border-2 border-dashed border-zinc-300 rounded-lg p-4 hover:border-[#0F766E] transition-colors">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-zinc-700">{label}</p>
-          {file ? (
-            <p className="text-xs text-[#0F766E] mt-1 truncate">{file.name}</p>
-          ) : (
-            <p className="text-xs text-zinc-500 mt-1">{t('noFileSelected')}</p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {file && (
+  }) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFile = e.target.files?.[0]
+      if (!selectedFile) return
+
+      const validation = validateFile(selectedFile)
+      if (!validation.valid) {
+        toast.error('Invalid file', { description: validation.error })
+        e.target.value = '' // Reset input
+        return
+      }
+      onChange(selectedFile)
+    }
+
+    const formatFileSize = (bytes: number) => {
+      if (bytes < 1024) return `${bytes} B`
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    }
+
+    return (
+      <div className="border-2 border-dashed border-zinc-300 rounded-lg p-4 hover:border-[#0F766E] transition-colors">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-zinc-700">{label}</p>
+            {file ? (
+              <div className="mt-1">
+                <p className="text-xs text-[#0F766E] truncate">{file.name}</p>
+                <p className="text-xs text-zinc-400">{formatFileSize(file.size)}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-zinc-500 mt-1">{t('noFileSelected')}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {file && (
+              <button
+                type="button"
+                onClick={() => onChange(null)}
+                className="p-1 text-zinc-400 hover:text-red-500 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => onChange(null)}
-              className="p-1 text-zinc-400 hover:text-red-500 transition-colors"
+              onClick={() => inputRef.current?.click()}
+              className="px-4 py-2 text-sm font-medium text-[#0F766E] bg-[#0F766E]/10 rounded-lg hover:bg-[#0F766E]/20 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              {file ? t('changeFile') : t('selectFile')}
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="px-4 py-2 text-sm font-medium text-[#0F766E] bg-[#0F766E]/10 rounded-lg hover:bg-[#0F766E]/20 transition-colors"
-          >
-            {file ? t('changeFile') : t('selectFile')}
-          </button>
+          </div>
         </div>
+        <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+          </svg>
+          <span>Max 2 MB | {ALLOWED_EXTENSIONS}</span>
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={ALLOWED_EXTENSIONS}
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        onChange={(e) => onChange(e.target.files?.[0] || null)}
-        className="hidden"
-      />
-    </div>
-  )
+    )
+  }
 
   if (isSubmitted) {
     return (

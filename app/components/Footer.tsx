@@ -18,9 +18,8 @@ import { Link } from '@/i18n/routing'
  */
 
 const socialLinks = [
-  { label: 'LinkedIn', href: '#' },
-  { label: 'Facebook', href: '#' },
-  { label: 'X/Twitter', href: '#' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/cancer-care-africa-cancaf/' },
+  { label: 'X/Twitter', href: 'https://twitter.com/CCancaf' },
 ]
 
 const marqueeWords = [
@@ -118,6 +117,8 @@ export default function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center text-white hover:text-[#F59E0B] motion-colors text-sm focus-ring"
                   >
                     {link.label}
@@ -129,6 +130,11 @@ export default function Footer() {
             <h4 className="text-white/50 text-sm mb-4">{nav('contact')}</h4>
             <div className="space-y-2 text-sm text-white/80">
               <p>info@cancaf.org</p>
+              <p>
+                <a href="tel:+233593443344" className="hover:text-[#F59E0B] motion-colors">
+                  +233 593 443 344
+                </a>
+              </p>
               <p>Accra, Ghana</p>
             </div>
           </div>

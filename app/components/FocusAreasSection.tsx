@@ -211,12 +211,12 @@ export default function FocusAreasSection() {
               variants={staggerItem}
             >
               <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
-              <span className="text-sm text-zinc-900">{t('tag')}</span>
+              <span className="text-base font-medium text-zinc-900">{t('tag')}</span>
             </motion.div>
 
             {/* Heading */}
             <motion.h2
-              className="text-3xl md:text-4xl lg:text-[42px] font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15]"
+              className="text-3xl md:text-4xl lg:text-5xl font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15]"
               variants={staggerItem}
             >
               {t('title')}
@@ -225,7 +225,7 @@ export default function FocusAreasSection() {
 
           {/* Subtext */}
           <motion.p
-            className="text-zinc-500 text-sm max-w-sm mt-4 lg:mt-8 lg:text-right"
+            className="text-zinc-600 text-lg max-w-md mt-4 lg:mt-8 lg:text-end"
             variants={staggerItem}
           >
             {t('subtitle')}
@@ -300,12 +300,12 @@ export default function FocusAreasSection() {
                   </div>
 
                   {/* Title - min-height ensures alignment, no line-clamp for readability */}
-                  <h4 className="text-white text-xl font-semibold font-[family-name:var(--font-montserrat)] mb-3 leading-snug min-h-[56px]">
+                  <h4 className="text-white text-2xl font-semibold font-[family-name:var(--font-montserrat)] mb-3 leading-snug min-h-[64px]">
                     {area.title}
                   </h4>
 
                   {/* Description - line-clamp-3 for more content, lighter color for contrast */}
-                  <p className="text-white/80 text-sm leading-relaxed line-clamp-3">
+                  <p className="text-white/80 text-base leading-relaxed line-clamp-3">
                     {area.description}
                   </p>
                 </div>

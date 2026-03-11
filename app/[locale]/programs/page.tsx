@@ -59,9 +59,63 @@ export default async function ProgramsPage() {
         backgroundImage="/home/capacitybuilding.webp"
       />
 
-      {/* Featured Programme - CGCP-ON Africa */}
-      <section className="py-12 md:py-16 bg-white">
+      {/* Flagship Programme - CGCP-ON Africa (Featured First) */}
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="w-2 h-2 bg-[#F59E0B] rounded-full"></span>
+              <span className="text-base font-medium text-zinc-600">{t('flagshipTag')}</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-tight mb-4">
+              CGCPON Africa
+            </h2>
+            <p className="text-xl text-zinc-600 max-w-3xl mx-auto">
+              Cancer Genetic Counselling Certificate Programme for Oncology Nurses
+            </p>
+          </div>
+
+          {/* Partner Logos */}
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 mb-12">
+            {/* CanCAF Logo */}
+            <div className="bg-white rounded-2xl p-6 w-52 h-44 flex flex-col items-center justify-center shadow-lg border border-zinc-100">
+              <Image
+                src="/CancafLogoRemBg.png"
+                alt="CanCAF"
+                width={160}
+                height={100}
+                className="w-auto h-20 object-contain mb-3"
+              />
+              <span className="text-sm font-semibold text-zinc-700">CanCAF</span>
+            </div>
+
+            {/* WAGMC Logo */}
+            <div className="bg-white rounded-2xl p-6 w-52 h-44 flex flex-col items-center justify-center shadow-lg border border-zinc-100">
+              <Image
+                src="/wagmcAlone.png"
+                alt="WAGMC"
+                width={160}
+                height={100}
+                className="w-auto h-20 object-contain mb-3"
+              />
+              <span className="text-sm font-semibold text-zinc-700 text-center">West African Genetic Medicine Centre</span>
+            </div>
+
+            {/* Aster Guardians Logo */}
+            <div className="bg-white rounded-2xl p-6 w-52 h-44 flex flex-col items-center justify-center shadow-lg border border-zinc-100">
+              <Image
+                src="/asterLogoAlone.png"
+                alt="Aster Guardians"
+                width={160}
+                height={100}
+                className="w-auto h-20 object-contain mb-3"
+              />
+              <span className="text-sm font-semibold text-zinc-700 text-center">Aster Guardians Global Nursing Award</span>
+            </div>
+          </div>
+
+          {/* Programme Card - Simplified */}
           <Link
             href="/programs/cgcp-on-africa"
             className="block group"
@@ -75,52 +129,63 @@ export default async function ProgramsPage() {
                   fill
                   className="object-cover opacity-40 group-hover:opacity-50 group-hover:scale-105 motion-slow"
                 />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0F766E]/90 via-[#0F766E]/70 to-[#0F766E]/50" />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0F766E]/80 via-[#0F766E]/60 to-transparent" />
 
               {/* Content */}
-              <div className="relative p-8 md:p-12 lg:p-16 min-h-[350px] flex flex-col justify-between">
-                <div>
-                  {/* Badges */}
-                  <div className="flex flex-wrap items-center gap-3 mb-6">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500 text-white text-sm font-medium rounded-full">
-                      <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                      {tCgcp('acceptingApplications')}
-                    </span>
-                    <span className="px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full">
-                      {tCgcp('featuredProgramme')}
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white font-[family-name:var(--font-montserrat)] leading-tight mb-4 max-w-2xl">
-                    {tCgcp('title')}
-                  </h2>
-
-                  {/* Description */}
-                  <p className="text-white/80 max-w-xl mb-8">
-                    {tCgcp('subtitle')}
-                  </p>
-                </div>
-
-                {/* CTA */}
-                <div>
-                  <span className="inline-flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white rounded-full text-sm font-medium group-hover:bg-[#D4A017] motion-fast">
-                    {tCgcp('learnAndApply')}
-                    <svg className="w-4 h-4 group-hover:translate-x-1 motion-fast" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+              <div className="relative p-8 md:p-12 lg:p-16">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500 text-white text-sm font-medium rounded-full">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    {tCgcp('acceptingApplications')}
+                  </span>
+                  <span className="px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full">
+                    {tCgcp('featuredProgramme')}
                   </span>
                 </div>
+
+                {/* Title */}
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white font-[family-name:var(--font-montserrat)] leading-tight mb-4 max-w-3xl">
+                  {tCgcp('title')}
+                </h3>
+
+                {/* Brief Description */}
+                <p className="text-white/85 text-lg leading-relaxed max-w-2xl mb-8">
+                  {t('flagshipBrief')}
+                </p>
+
+                {/* CTA */}
+                <span className="inline-flex items-center gap-3 px-6 py-3 bg-[#F59E0B] text-white rounded-full text-base font-medium group-hover:bg-[#D4A017] motion-fast">
+                  {tCgcp('learnAndApply')}
+                  <svg className="w-5 h-5 group-hover:translate-x-1 motion-fast" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
               </div>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* Content Section */}
+      {/* Programs Overview Section */}
       <section className="py-16 md:py-24 bg-zinc-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
+              <span className="text-base font-medium text-zinc-600">{t('programAreasTag')}</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-tight mb-4">
+              {t('programAreasTitle')}
+            </h2>
+            <p className="text-lg text-zinc-600 max-w-3xl mx-auto">
+              {t('introText')}
+            </p>
+          </div>
+
+          {/* Programs Grid */}
           <div className="space-y-6">
             {programs.map((program) => (
               <div
@@ -158,6 +223,35 @@ export default async function ProgramsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 md:py-20 bg-[#0F766E]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white font-[family-name:var(--font-montserrat)] mb-4">
+            {t('ctaTitle')}
+          </h2>
+          <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+            {t('ctaDesc')}
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/programs/cgcp-on-africa"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white rounded-full text-base font-medium motion-fast hover:bg-[#D4A017] hover:-translate-y-0.5"
+            >
+              {t('applyNow')}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white border border-white/30 rounded-full text-base font-medium motion-fast hover:bg-white/20"
+            >
+              {t('partnerWithUs')}
+            </Link>
           </div>
         </div>
       </section>

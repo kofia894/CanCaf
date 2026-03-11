@@ -121,6 +121,16 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+html {
+  font-size: 17px; /* Base font size increased from 16px for better readability */
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 18px; /* Slightly larger on desktop */
+  }
+}
+
 body {
   font-family: var(--font-body), sans-serif;
 }

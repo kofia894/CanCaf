@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { Toaster } from 'sonner';
 import SmoothScroll from "../components/SmoothScroll";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -41,6 +42,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         className={`${montserrat.variable} ${openSans.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
+          <Toaster position="top-right" richColors closeButton />
           <SmoothScroll>
             <Navbar />
             <main>{children}</main>

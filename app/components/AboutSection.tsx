@@ -34,12 +34,12 @@ export default function AboutSection() {
               variants={staggerItem}
             >
               <span className="w-2 h-2 bg-[#F59E0B] rounded-full"></span>
-              <span className="text-sm text-zinc-900">{t('tag')}</span>
+              <span className="text-base font-medium text-zinc-900">{t('tag')}</span>
             </motion.div>
 
             {/* Heading */}
             <motion.h2
-              className="text-3xl md:text-4xl lg:text-[42px] font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15] mb-4"
+              className="text-3xl md:text-4xl lg:text-5xl font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-[1.15] mb-5"
               variants={staggerItem}
             >
               {t('title')}
@@ -47,7 +47,7 @@ export default function AboutSection() {
 
             {/* Subtext */}
             <motion.p
-              className="text-zinc-500 text-sm leading-relaxed mb-6"
+              className="text-zinc-600 text-lg leading-relaxed mb-8"
               variants={staggerItem}
             >
               {t('description')}

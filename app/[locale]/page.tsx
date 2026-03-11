@@ -1,21 +1,25 @@
 import Hero from "../components/Hero";
-import AboutSection from "../components/AboutSection";
-import FocusAreasSection from "../components/FocusAreasSection";
+import HomeNewsSection from "../components/HomeNewsSection";
+import FlagshipProgramSection from "../components/FlagshipProgramSection";
 import ImpactStatsSection from "../components/ImpactStatsSection";
+import { client, LATEST_NEWS_QUERY, fetchOptions, NewsItem } from "@/app/lib/sanity";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch latest news from Sanity
+  const news = await client.fetch<NewsItem[]>(LATEST_NEWS_QUERY, {}, fetchOptions);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero section - full bleed, navbar overlays on top */}
       <Hero />
 
-      {/* About Section */}
-      <AboutSection />
+      {/* News Section */}
+      <HomeNewsSection news={news} />
 
-      {/* Focus Areas Section */}
-      <FocusAreasSection />
+      {/* Flagship Program Section */}
+      <FlagshipProgramSection />
 
-      {/* Impact Stats Section */}
+      {/* Impact Stats Section - Cancer figures */}
       <ImpactStatsSection />
     </div>
   );

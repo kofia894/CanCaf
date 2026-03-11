@@ -11,5 +11,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  // The html/body tags are in app/[locale]/layout.tsx
+  // This root layout just passes through to the locale layout
+  return children as React.ReactElement;
 }
