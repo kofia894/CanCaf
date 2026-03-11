@@ -10,6 +10,9 @@ import { Link } from '@/i18n/routing'
  * Displayed when CGCPON applications are not currently open
  */
 
+// Note: Metadata for this page is defined in layout.tsx or parent route
+// since this is a client component
+
 export default function ApplicationsClosedPage() {
 
   return (

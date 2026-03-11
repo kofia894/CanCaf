@@ -7,6 +7,7 @@ import { Toaster } from 'sonner';
 import SmoothScroll from "../components/SmoothScroll";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { OrganizationJsonLd, WebsiteJsonLd } from "../components/JsonLd";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -38,6 +39,13 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <head>
+        <OrganizationJsonLd />
+        <WebsiteJsonLd />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body
         className={`${montserrat.variable} ${openSans.variable} antialiased`}
       >

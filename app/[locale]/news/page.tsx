@@ -4,9 +4,16 @@ import { Link } from '@/i18n/routing'
 import PageHero from '../../components/PageHero'
 import { client, ALL_NEWS_QUERY, fetchOptions, NewsItem, urlFor } from '@/app/lib/sanity'
 
-export const metadata = {
-  title: 'News & Activities - CanCAF',
-  description: 'Stay updated with the latest news and activities from CanCAF.',
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'News & Activities',
+  description: 'Stay updated with the latest news, events, and activities from CanCAF. Read about our work strengthening cancer care across Africa.',
+  openGraph: {
+    title: 'News & Activities - CanCAF',
+    description: 'Stay updated with the latest news, events, and activities from CanCAF.',
+    images: ['/home/ealydetect.webp'],
+  },
 }
 
 export default async function NewsPage() {

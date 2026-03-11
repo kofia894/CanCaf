@@ -15,13 +15,28 @@ export async function generateMetadata({ params }: Props) {
 
   if (!news) {
     return {
-      title: 'News Not Found - CanCAF',
+      title: 'News Not Found',
     }
   }
 
+  const hasImage = news.image?.asset
+  const imageUrl = hasImage ? urlFor(news.image).width(1200).height(630).url() : '/home/ealydetect.webp'
+
   return {
-    title: `${news.title} - CanCAF`,
-    description: `Read about ${news.title} from CanCAF.`,
+    title: news.title,
+    description: `Read about ${news.title} from CanCAF - Cancer Care Africa Foundation.`,
+    openGraph: {
+      title: news.title,
+      description: `Read about ${news.title} from CanCAF.`,
+      type: 'article',
+      publishedTime: news.publishedAt,
+      images: [imageUrl],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: news.title,
+      images: [imageUrl],
+    },
   }
 }
 
@@ -53,9 +68,9 @@ export default async function NewsDetailPage({ params }: Props) {
   return (
     <article className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative bg-zinc-900 pt-[132px]">
+      <div className="relative bg-zinc-900 pt-[100px] md:pt-[132px]">
         {/* Background Image */}
-        <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
+        <div className="relative h-[45vh] md:h-[50vh] overflow-hidden">
           {imageUrl ? (
             <>
               <Image

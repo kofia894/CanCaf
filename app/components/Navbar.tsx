@@ -215,25 +215,25 @@ export default function Navbar() {
           : 'bg-white shadow-md border-b border-zinc-200/50'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24 py-4">
+          <div className="flex items-center justify-between h-16 md:h-24 py-2 md:py-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 focus-ring">
-              <div className="relative h-12 md:h-14 w-auto">
+            <Link href="/" className="flex items-center gap-2 md:gap-3 focus-ring">
+              <div className="relative h-10 md:h-14 w-auto">
                 <Image
                   src="/CancafLogoRemBg.png"
                   alt="CanCAF Logo"
                   width={280}
                   height={95}
-                  className="h-12 md:h-14 w-auto"
+                  className="h-10 md:h-14 w-auto"
                   priority
                 />
               </div>
-              {/* Text next to logo - hidden on mobile for cleaner look */}
-              <div className="hidden md:block">
-                <p className="text-lg font-bold font-[family-name:var(--font-montserrat)] text-[#0F766E] leading-tight">
+              {/* Text next to logo - shown on all screens */}
+              <div>
+                <p className="text-base md:text-lg font-bold font-[family-name:var(--font-montserrat)] text-[#0F766E] leading-tight">
                   CanCAF
                 </p>
-                <p className="text-xs text-zinc-500 font-medium">
+                <p className="text-[10px] md:text-xs text-zinc-500 font-medium leading-tight">
                   Cancer Care Africa Foundation
                 </p>
               </div>

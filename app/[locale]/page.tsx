@@ -1,8 +1,19 @@
+import { Metadata } from "next";
 import Hero from "../components/Hero";
 import HomeNewsSection from "../components/HomeNewsSection";
 import FlagshipProgramSection from "../components/FlagshipProgramSection";
 import ImpactStatsSection from "../components/ImpactStatsSection";
 import { client, LATEST_NEWS_QUERY, fetchOptions, NewsItem } from "@/app/lib/sanity";
+
+export const metadata: Metadata = {
+  title: "CanCAF - Strengthening Cancer Care Across Africa",
+  description: "CanCAF (Cancer Care Africa Foundation) is dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building initiatives.",
+  openGraph: {
+    title: "CanCAF - Strengthening Cancer Care Across Africa",
+    description: "Dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building.",
+    type: "website",
+  },
+};
 
 export default async function Home() {
   // Fetch latest news from Sanity

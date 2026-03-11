@@ -30,9 +30,9 @@ export default function Hero() {
       </div>
 
       {/* Content Container */}
-      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
+      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center pb-4 md:pb-0">
         {/* Main Content - Left Side */}
-        <div className="max-w-2xl pt-24 md:pt-32">
+        <div className="max-w-2xl pt-20 md:pt-32">
           {/* Headline */}
           <motion.h1
             className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white font-[family-name:var(--font-montserrat)] leading-tight"
@@ -77,11 +77,41 @@ export default function Hero() {
             </Link>
           </motion.div>
 
+          {/* Mobile Application Banner - Compact version for small screens */}
+          <motion.div
+            className="md:hidden mt-8"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+          >
+            <Link
+              href="/programs/cgcp-on-africa"
+              className="flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-lg"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span className="text-xs font-semibold text-green-600 uppercase">Open</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-zinc-900 truncate">CGCPON Africa</p>
+                <p className="text-xs text-zinc-500 truncate">Oncology Nurses Certificate Programme</p>
+              </div>
+              <div className="w-7 h-7 rounded-full bg-[#0F766E] flex items-center justify-center flex-shrink-0">
+                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+          </motion.div>
+
         </div>
 
-        {/* Application Card - Bottom Right */}
+        {/* Application Card - Hidden on mobile, visible on tablet+ */}
         <motion.div
-          className="absolute bottom-8 end-4 md:bottom-12 md:end-8 lg:bottom-16 lg:end-16 z-10"
+          className="hidden md:block absolute bottom-12 end-8 lg:bottom-16 lg:end-16 z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.4 }}

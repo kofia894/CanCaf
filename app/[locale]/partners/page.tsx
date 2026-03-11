@@ -3,9 +3,16 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import PageHero from '../../components/PageHero'
 
-export const metadata = {
-  title: 'Partners & Supporters - CanCAF',
-  description: 'Meet our partners and supporters who help us strengthen cancer care across Africa.',
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Partners & Supporters',
+  description: 'Meet our partners and supporters who help CanCAF strengthen cancer care across Africa. Join our growing network of healthcare institutions, NGOs, and development organizations.',
+  openGraph: {
+    title: 'Partners & Supporters - CanCAF',
+    description: 'Meet our partners and supporters who help strengthen cancer care across Africa.',
+    images: ['/home/innandresearch.webp'],
+  },
 }
 
 export default async function PartnersPage() {

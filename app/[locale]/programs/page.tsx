@@ -3,9 +3,16 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import PageHero from '../../components/PageHero'
 
-export const metadata = {
-  title: 'Programs - CanCAF',
-  description: 'Explore our programs focused on cancer care capacity building across Africa.',
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Programs',
+  description: 'Explore CanCAF programs focused on cancer care capacity building across Africa, including the flagship CGCPON Africa certificate programme for oncology nurses.',
+  openGraph: {
+    title: 'Programs - CanCAF',
+    description: 'Explore our cancer care programs including capacity building, awareness, early detection, and the flagship CGCPON Africa programme.',
+    images: ['/home/capacitybuilding.webp'],
+  },
 }
 
 export default async function ProgramsPage() {
