@@ -27,6 +27,15 @@ export function urlFor(source: any) {
   return builder.image(source);
 }
 
+// Gallery image type
+export interface GalleryImage {
+  _key: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  asset: any;
+  caption?: string;
+  alt?: string;
+}
+
 // News type matching Sanity schema
 export interface NewsItem {
   _id: string;
@@ -35,6 +44,7 @@ export interface NewsItem {
   publishedAt: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   image?: any;
+  gallery?: GalleryImage[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: any[];
 }
@@ -64,8 +74,29 @@ export const NEWS_BY_SLUG_QUERY = `*[_type == "news" && slug.current == $slug][0
   slug,
   publishedAt,
   image,
+  gallery[]{
+    _key,
+    asset,
+    caption,
+    alt
+  },
   body
 }`;
 
 // Fetch options with revalidation
 export const fetchOptions = { next: { revalidate: 60 } };
+
+// Site Settings type
+export interface SiteSettings {
+  cgcponApplicationsOpen: boolean;
+  cgcponClosedMessage: string;
+}
+
+// Query for site settings (singleton document)
+export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
+  cgcponApplicationsOpen,
+  cgcponClosedMessage
+}`;
+
+// Fetch site settings with shorter revalidation for quick updates
+export const settingsFetchOptions = { next: { revalidate: 10 } };

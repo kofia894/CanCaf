@@ -24,7 +24,40 @@ export const newsType = defineType({
     }),
     defineField({
       name: 'image',
+      title: 'Featured Image',
       type: 'image',
+      description: 'Main image displayed at the top of the article',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Image Gallery',
+      type: 'array',
+      description: 'Additional images related to this news article',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            defineField({
+              name: 'caption',
+              type: 'string',
+              title: 'Caption',
+              description: 'Optional caption for this image',
+            }),
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Alt Text',
+              description: 'Alternative text for accessibility',
+            }),
+          ],
+        },
+      ],
     }),
     defineField({
       name: 'body',

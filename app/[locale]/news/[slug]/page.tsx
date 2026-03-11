@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { client, NEWS_BY_SLUG_QUERY, fetchOptions, NewsItem, urlFor } from '@/app/lib/sanity'
 import { PortableText } from '@portabletext/react'
+import ImageGallery from './ImageGallery'
 
 type Props = {
   params: Promise<{ slug: string; locale: string }>
@@ -40,6 +41,15 @@ export default async function NewsDetailPage({ params }: Props) {
     day: 'numeric',
   })
 
+  // Process gallery images
+  const galleryImages = news.gallery?.map((img) => ({
+    _key: img._key,
+    url: urlFor(img).width(1200).height(800).url(),
+    thumbUrl: urlFor(img).width(400).height(300).url(),
+    caption: img.caption || '',
+    alt: img.alt || news.title,
+  })) || []
+
   return (
     <article className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -69,7 +79,7 @@ export default async function NewsDetailPage({ params }: Props) {
               href="/news"
               className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
               Back to News
@@ -108,13 +118,23 @@ export default async function NewsDetailPage({ params }: Props) {
             </p>
           )}
 
+          {/* Image Gallery */}
+          {galleryImages.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-zinc-200">
+              <h2 className="text-2xl font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-6">
+                Photo Gallery
+              </h2>
+              <ImageGallery images={galleryImages} />
+            </div>
+          )}
+
           {/* Back Link */}
           <div className="mt-12 pt-8 border-t border-zinc-200">
             <Link
               href="/news"
               className="inline-flex items-center gap-2 text-[#0F766E] font-medium hover:underline"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
               Back to all news
