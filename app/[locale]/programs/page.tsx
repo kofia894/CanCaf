@@ -108,18 +108,6 @@ export default async function ProgramsPage() {
               />
               <span className="text-sm font-semibold text-zinc-700 text-center">West African Genetic Medicine Centre</span>
             </div>
-
-            {/* Aster Guardians Logo */}
-            <div className="bg-white rounded-2xl p-6 w-52 h-44 flex flex-col items-center justify-center shadow-lg border border-zinc-100">
-              <Image
-                src="/asterLogoAlone.png"
-                alt="Aster Guardians"
-                width={160}
-                height={100}
-                className="w-auto h-20 object-contain mb-3"
-              />
-              <span className="text-sm font-semibold text-zinc-700 text-center">Aster Guardians Global Nursing Award</span>
-            </div>
           </div>
 
           {/* Programme Card - Simplified */}

@@ -19,6 +19,7 @@ import { Link } from '@/i18n/routing'
 
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/share/v/18KQfsQ4sA/' },
+  { label: 'YouTube', href: 'https://youtube.com/@ccancaf?si=YEED_8xtPYAZ4N_C' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/company/cancer-care-africa-cancaf/' },
   { label: 'X/Twitter', href: 'https://twitter.com/CCancaf' },
 ]

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props) {
   }
 
   const hasImage = news.image?.asset
-  const imageUrl = hasImage ? urlFor(news.image).width(1200).height(630).url() : '/home/ealydetect.webp'
+  const imageUrl = hasImage ? urlFor(news.image).width(1200).height(630).fit('crop').crop('top').url() : '/home/ealydetect.webp'
 
   return {
     title: news.title,
@@ -49,7 +49,7 @@ export default async function NewsDetailPage({ params }: Props) {
   }
 
   const hasImage = news.image?.asset
-  const imageUrl = hasImage ? urlFor(news.image).width(1200).height(675).url() : null
+  const imageUrl = hasImage ? urlFor(news.image).width(1200).height(675).fit('crop').crop('top').url() : null
   const formattedDate = new Date(news.publishedAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -59,8 +59,8 @@ export default async function NewsDetailPage({ params }: Props) {
   // Process gallery images
   const galleryImages = news.gallery?.map((img) => ({
     _key: img._key,
-    url: urlFor(img).width(1200).height(800).url(),
-    thumbUrl: urlFor(img).width(400).height(300).url(),
+    url: urlFor(img).width(1600).url(), // Full image without cropping for lightbox
+    thumbUrl: urlFor(img).width(400).height(300).fit('crop').crop('top').url(),
     caption: img.caption || '',
     alt: img.alt || news.title,
   })) || []

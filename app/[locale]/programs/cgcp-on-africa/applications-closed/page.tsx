@@ -168,7 +168,6 @@ export default function ApplicationsClosedPage() {
             <div className="flex flex-wrap items-center justify-center gap-6">
               <Image src="/CancafLogoRemBg.png" alt="CanCAF" width={100} height={50} className="h-10 w-auto opacity-70" />
               <Image src="/wagmcAlone.png" alt="WAGMC" width={100} height={50} className="h-10 w-auto opacity-70" />
-              <Image src="/asterLogoAlone.png" alt="Aster Guardians" width={100} height={50} className="h-10 w-auto opacity-70" />
             </div>
           </div>
         </div>

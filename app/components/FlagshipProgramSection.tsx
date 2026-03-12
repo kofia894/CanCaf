@@ -121,27 +121,12 @@ export default function FlagshipProgramSection() {
                       />
                       <span className="text-sm font-semibold text-zinc-700">WAGMC</span>
                     </div>
-
-                    {/* Aster Guardians Logo */}
-                    <div className="bg-white rounded-2xl p-5 w-44 h-36 flex flex-col items-center justify-center shadow-lg">
-                      <Image
-                        src="/asterLogoAlone.png"
-                        alt="Aster Guardians"
-                        width={140}
-                        height={80}
-                        className="w-auto h-18 object-contain mb-3"
-                      />
-                      <span className="text-sm font-semibold text-zinc-700">Aster Guardians</span>
-                    </div>
                   </div>
 
                   {/* Partner Names */}
                   <div className="mt-6 text-center lg:text-end">
                     <p className="text-white/70 text-sm leading-relaxed">
                       West African Genetic Medicine Centre (WAGMC)
-                    </p>
-                    <p className="text-white/70 text-sm leading-relaxed">
-                      Aster Guardian Global Nursing Award
                     </p>
                   </div>
                 </div>

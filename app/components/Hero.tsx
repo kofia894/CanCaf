@@ -162,17 +162,8 @@ export default function Hero() {
                     className="w-7 h-7 object-contain"
                   />
                 </div>
-                <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center border-2 border-zinc-200 shadow-md overflow-hidden">
-                  <Image
-                    src="/asterLogoAlone.png"
-                    alt="Aster"
-                    width={32}
-                    height={32}
-                    className="w-7 h-7 object-contain"
-                  />
-                </div>
               </div>
-              <span className="text-xs font-medium text-zinc-600">In partnership with WAGMC & Aster</span>
+              <span className="text-xs font-medium text-zinc-600">In partnership with WAGMC</span>
             </div>
 
             {/* CTA */}

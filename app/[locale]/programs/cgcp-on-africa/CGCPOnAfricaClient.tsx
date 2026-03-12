@@ -127,7 +127,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 {t('subtitle')}
               </motion.p>
 
-              {/* Key Info: Deadline & Fee */}
+              {/* Key Info: Deadline, Duration & Fee */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -139,6 +139,12 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {t('deadline')}
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+                  <svg className="w-4 h-4 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                  Programme: April – June 2026
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#F59E0B]/20 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-[#F59E0B]/30">
                   <svg className="w-4 h-4 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -201,18 +207,6 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                     />
                     <span className="text-xs font-semibold text-zinc-700 text-center">WAGMC</span>
                   </div>
-
-                  {/* Aster Guardians Logo */}
-                  <div className="bg-white rounded-2xl p-5 w-40 h-32 flex flex-col items-center justify-center shadow-lg">
-                    <Image
-                      src="/asterLogoAlone.png"
-                      alt="Aster Guardians"
-                      width={120}
-                      height={60}
-                      className="w-auto h-14 object-contain mb-2"
-                    />
-                    <span className="text-xs font-semibold text-zinc-700 text-center">Aster Guardians</span>
-                  </div>
                 </div>
               </div>
             </motion.div>
@@ -235,10 +229,6 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
               <Image src="/wagmcAlone.png" alt="WAGMC" width={80} height={40} className="w-auto h-10 object-contain mb-1" />
               <span className="text-xs font-medium text-zinc-600">WAGMC</span>
             </div>
-            <div className="bg-white rounded-xl p-4 w-28 h-24 flex flex-col items-center justify-center shadow-sm border border-zinc-200">
-              <Image src="/asterLogoAlone.png" alt="Aster" width={80} height={40} className="w-auto h-10 object-contain mb-1" />
-              <span className="text-xs font-medium text-zinc-600">Aster</span>
-            </div>
           </div>
         </div>
       </section>
@@ -258,10 +248,10 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
 
               <div className="space-y-4 text-zinc-600 leading-relaxed">
                 <p>
-                  <strong className="text-zinc-900">CGC-PON Africa</strong> is CanCAF&apos;s flagship training programme, made possible through the <strong className="text-[#F59E0B]">2025 Aster Guardians Global Nursing Award</strong> won by Mrs. Naomi Oyoe Ohene Oti.
+                  <strong className="text-zinc-900">CGCP‑ON Africa</strong> is CanCAF&apos;s flagship training initiative, powered by the prestigious <strong className="text-[#F59E0B]">2025 Aster Guardians Global Nursing Award</strong> received by Mrs. Naomi Oyoe Ohene Oti.
                 </p>
                 <p>
-                  This collaboration brings together <strong className="text-zinc-900">CanCAF</strong> as the driving partner, <strong className="text-zinc-900">WAGMC</strong> for training delivery, and <strong className="text-zinc-900">Aster Guardians</strong> providing grant funding&mdash;transforming a moment of personal achievement into a continental movement.
+                  Through this collaboration, <strong className="text-zinc-900">CanCAF</strong> leads the programme&apos;s vision while <strong className="text-zinc-900">WAGMC</strong> delivers the training, transforming Mrs. Ohene Oti&apos;s award-winning achievement into a continent‑wide movement advancing cancer genetic counselling for oncology nurses across Africa.
                 </p>
               </div>
 
@@ -314,13 +304,13 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
               What You&apos;ll Learn
             </h2>
             <p className="text-zinc-600 max-w-xl mx-auto">
-              11 comprehensive modules covering genetics, counselling skills, ethics, and practical assessment.
+              Include but not limited to the following comprehensive modules covering genetics, counselling skills, ethics, practical assessment.
             </p>
           </div>
 
           {/* Course Grid - New Design */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {courseTopics.map((topic, index) => (
+            {courseTopics.slice(0, 6).map((topic) => (
               <div
                 key={topic.key}
                 className="group bg-white rounded-xl p-5 border border-zinc-200 hover:border-[#0F766E]/40 hover:shadow-lg motion-all cursor-default"
@@ -352,7 +342,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 <span className="font-medium text-zinc-900">100% Virtual</span>
               </div>
               <span className="w-px h-5 bg-zinc-200"></span>
-              {/* <span className="text-zinc-600 text-sm">July - November 2025</span> */}
+              <span className="text-zinc-600 text-sm">April – June 2026</span>
             </div>
           </div>
         </div>
@@ -402,9 +392,15 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3 text-white/90">
                   <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm">Applications close: <strong>March 24, 2026</strong></span>
+                </div>
+                <div className="flex items-center gap-3 text-white/90">
+                  <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                   </svg>
-                  <span className="text-sm">Applications close: <strong>March 20, 2026</strong></span>
+                  <span className="text-sm">Programme duration: <strong>April – June 2026</strong></span>
                 </div>
               </div>
 
@@ -478,19 +474,6 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
               />
               <span className="text-sm font-semibold text-zinc-700">WAGMC</span>
               <span className="text-xs text-zinc-500">Training Delivery</span>
-            </div>
-
-            {/* Aster Guardians Logo */}
-            <div className="bg-zinc-50 rounded-2xl p-6 w-52 h-44 flex flex-col items-center justify-center border border-zinc-200 hover:border-[#0F766E]/30 motion-colors">
-              <Image
-                src="/asterLogoAlone.png"
-                alt="Aster Guardians"
-                width={160}
-                height={100}
-                className="w-auto h-20 object-contain mb-3"
-              />
-              <span className="text-sm font-semibold text-zinc-700 text-center">Aster Guardians</span>
-              <span className="text-xs text-zinc-500">Grant Funding</span>
             </div>
           </div>
 

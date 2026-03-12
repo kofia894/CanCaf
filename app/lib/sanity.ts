@@ -67,6 +67,18 @@ export const ALL_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc){
   image
 }`;
 
+// Query for paginated news items
+export const PAGINATED_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc)[$start...$end]{
+  _id,
+  title,
+  slug,
+  publishedAt,
+  image
+}`;
+
+// Query for total news count
+export const NEWS_COUNT_QUERY = `count(*[_type == "news"])`;
+
 // Query for single news item by slug
 export const NEWS_BY_SLUG_QUERY = `*[_type == "news" && slug.current == $slug][0]{
   _id,
