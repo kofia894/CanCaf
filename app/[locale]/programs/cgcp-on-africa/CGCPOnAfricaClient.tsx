@@ -127,19 +127,21 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 {t('subtitle')}
               </motion.p>
 
-              {/* Key Info: Deadline, Duration & Fee */}
+              {/* Key Info: Deadline, Duration & Fee - Only show deadline when applications are open */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut', delay: 0.25 }}
                 className="flex flex-wrap items-center gap-3 mb-8"
               >
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
-                  <svg className="w-4 h-4 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {t('deadline')}
-                </span>
+                {applicationsOpen && (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+                    <svg className="w-4 h-4 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {t('deadline')}
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
                   <svg className="w-4 h-4 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -388,14 +390,23 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 {t('readyToApplyDesc')}
               </p>
 
-              {/* Key Info: Dates & Fee */}
+              {/* Key Info: Dates & Fee - Only show deadline when applications are open */}
               <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-white/90">
-                  <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="text-sm">Applications close: <strong>March 24, 2026</strong></span>
-                </div>
+                {applicationsOpen ? (
+                  <div className="flex items-center gap-3 text-white/90">
+                    <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm">Applications close: <strong>March 24, 2026</strong></span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 text-white/90">
+                    <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm">Applications opening soon</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 text-white/90">
                   <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -421,9 +432,13 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
 
               <button
                 onClick={handleApplyClick}
-                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F59E0B] text-white rounded-full text-base font-medium motion-fast hover:bg-[#D4A017] active:scale-[0.98]"
+                className={`w-full inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-medium motion-fast active:scale-[0.98] ${
+                  applicationsOpen
+                    ? 'bg-[#F59E0B] text-white hover:bg-[#D4A017]'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
               >
-                {t('startApplication')}
+                {applicationsOpen ? t('startApplication') : 'Learn More'}
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>

@@ -68,38 +68,45 @@ export default async function NewsDetailPage({ params }: Props) {
   return (
     <article className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative bg-zinc-900 pt-[100px] md:pt-[132px]">
-        {/* Background Image */}
-        <div className="relative h-[45vh] md:h-[50vh] overflow-hidden">
+      <div className="relative min-h-[60vh] bg-zinc-900 pt-[132px]">
+        {/* Background Image - blurred and grayscale */}
+        <div className="absolute inset-0 overflow-hidden">
           {imageUrl ? (
             <>
-              <Image
-                src={imageUrl}
-                alt={news.title}
-                fill
-                className="object-cover opacity-40"
-                priority
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 blur-sm grayscale"
+                style={{
+                  backgroundImage: `url('${imageUrl}')`,
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent" />
+              {/* Teal gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0F766E]/30 via-[#0F766E]/40 to-[#0F766E]/50" />
             </>
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900" />
           )}
         </div>
 
-        {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 pb-12 md:pb-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link
-              href="/news"
-              className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors"
-            >
-              <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-              </svg>
-              Back to News
-            </Link>
-            <p className="text-[#0F766E] text-sm font-medium mb-3">{formattedDate}</p>
+        {/* Content */}
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+          <div className="max-w-4xl">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <Link
+                href="/news"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-all text-sm font-medium"
+              >
+                <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Back to News
+              </Link>
+              <p className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm font-medium">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                {formattedDate}
+              </p>
+            </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white font-[family-name:var(--font-montserrat)] leading-tight">
               {news.title}
             </h1>

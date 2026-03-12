@@ -61,7 +61,7 @@ export default async function PartnersPage() {
 
             {/* Middle Column - Two Content Cards */}
             <div className="flex flex-col gap-4 lg:gap-6 lg:row-span-2">
-              {/* Policy & Advocacy Card */}
+              {/* How We Collaborate Card */}
               <div className="bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-zinc-200 lg:flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-2 mb-5">
                   <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
@@ -75,7 +75,7 @@ export default async function PartnersPage() {
                 </p>
               </div>
 
-              {/* Systems Strengthening Card */}
+              {/* Our Approach Card */}
               <div className="bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-zinc-200 lg:flex-1 flex flex-col justify-center">
                 <div className="flex items-center gap-2 mb-5">
                   <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
@@ -120,6 +120,51 @@ export default async function PartnersPage() {
                   className="flex items-center justify-center gap-2 w-full py-3 bg-[#0F766E] text-white rounded-full text-sm font-medium motion-fast hover:bg-[#0d6b63] active:scale-[0.98] mt-6"
                 >
                   {t('becomePartner')}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Partner Section */}
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-zinc-50 to-zinc-100 rounded-3xl p-8 md:p-12 border border-zinc-200">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+              {/* Partner Logo */}
+              <div className="flex-shrink-0">
+                <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-2xl flex items-center justify-center p-4 shadow-sm border border-zinc-200">
+                  <Image
+                    src="/wagmcAlone.png"
+                    alt="WAGMC - West African Genetic Medicine Centre"
+                    width={120}
+                    height={120}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Partner Info */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-2 h-2 bg-[#0F766E] rounded-full"></span>
+                  <span className="text-sm text-[#0F766E] font-medium">{t('featuredPartnerTag')}</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-snug mb-4">
+                  {t('featuredPartnerTitle')}
+                </h3>
+                <p className="text-zinc-600 text-base leading-relaxed mb-6">
+                  {t('featuredPartnerDesc')}
+                </p>
+                <Link
+                  href="/programs/cgcp-on-africa"
+                  className="inline-flex items-center gap-2 text-[#0F766E] font-medium hover:underline"
+                >
+                  Learn about CGCPON Africa
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
