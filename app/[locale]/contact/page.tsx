@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { getTranslations } from 'next-intl/server'
 import PageHero from '../../components/PageHero'
+import ContactForm from '../../components/ContactForm'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -33,60 +34,7 @@ export default async function ContactPage() {
               <h2 className="text-2xl font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-6">
                 {t('getInTouch')}
               </h2>
-              <form className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-zinc-700 mb-2">
-                      {t('name')}
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      className="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none motion-fast"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-2">
-                      {t('email')}
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none motion-fast"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-zinc-700 mb-2">
-                    {t('subject')}
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    className="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none motion-fast"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-zinc-700 mb-2">
-                    {t('message')}
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    className="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none motion-fast resize-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-8 py-3 bg-[#0F766E] text-white rounded-full text-sm font-medium motion-fast hover:bg-[#0d6b63] hover:-translate-y-0.5 active:scale-[0.98]"
-                >
-                  {t('send')}
-                </button>
-              </form>
+              <ContactForm />
             </div>
 
             {/* Contact Info */}
