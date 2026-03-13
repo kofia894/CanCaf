@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
 import { submitContactForm, ContactFormData } from '../actions/submitContactForm'
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
@@ -13,6 +15,7 @@ export default function ContactForm() {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
   })
@@ -22,6 +25,10 @@ export default function ContactForm() {
   ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handlePhoneChange = (value: string | undefined) => {
+    setFormData((prev) => ({ ...prev, phone: value || '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +41,7 @@ export default function ContactForm() {
 
       if (result.success) {
         setFormState('success')
-        setFormData({ name: '', email: '', subject: '', message: '' })
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
       } else {
         setFormState('error')
         setErrorMessage(result.message)
@@ -91,7 +98,7 @@ export default function ContactForm() {
             htmlFor="name"
             className="block text-sm font-medium text-zinc-700 mb-2"
           >
-            {t('name')}
+            {t('name')} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -108,7 +115,7 @@ export default function ContactForm() {
             htmlFor="email"
             className="block text-sm font-medium text-zinc-700 mb-2"
           >
-            {t('email')}
+            {t('email')} <span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -123,10 +130,26 @@ export default function ContactForm() {
       </div>
       <div>
         <label
+          htmlFor="phone"
+          className="block text-sm font-medium text-zinc-700 mb-2"
+        >
+          {t('phoneNumber')} <span className="text-red-500">*</span>
+        </label>
+        <PhoneInput
+          international
+          defaultCountry="GH"
+          value={formData.phone}
+          onChange={handlePhoneChange}
+          className="phone-input-wrapper"
+          required
+        />
+      </div>
+      <div>
+        <label
           htmlFor="subject"
           className="block text-sm font-medium text-zinc-700 mb-2"
         >
-          {t('subject')}
+          {t('subject')} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -143,7 +166,7 @@ export default function ContactForm() {
           htmlFor="message"
           className="block text-sm font-medium text-zinc-700 mb-2"
         >
-          {t('message')}
+          {t('message')} <span className="text-red-500">*</span>
         </label>
         <textarea
           id="message"

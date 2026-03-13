@@ -10,7 +10,7 @@ import { submitNotificationInterest } from '@/app/actions/submitNotificationInte
 /**
  * Applications Closed Page
  *
- * Displayed when CGCPON applications are not currently open
+ * Displayed when CGCP-ON applications are not currently open
  */
 
 // Note: Metadata for this page is defined in layout.tsx or parent route
@@ -31,7 +31,7 @@ export default function ApplicationsClosedPage() {
       const result = await submitNotificationInterest({
         name: formData.name,
         email: formData.email,
-        programme: 'cgcpon-africa',
+        programme: 'cgcp-on-africa',
       })
 
       if (result.success) {
@@ -81,7 +81,7 @@ export default function ApplicationsClosedPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
           >
-            CGCPON Africa Applications
+            CGCP-ON Africa Applications
           </motion.h1>
 
           {/* Subtitle */}
@@ -220,7 +220,7 @@ export default function ApplicationsClosedPage() {
               About the Programme
             </h2>
             <p className="text-zinc-600 max-w-2xl mx-auto text-lg">
-              While applications are currently closed, discover what makes CGCPON Africa unique.
+              While applications are currently closed, discover what makes CGCP-ON Africa unique.
             </p>
           </div>
 

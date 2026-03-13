@@ -22,7 +22,7 @@ export const notificationInterestType = defineType({
       title: 'Programme',
       type: 'string',
       description: 'Which programme they want to be notified about',
-      initialValue: 'cgcpon-africa',
+      initialValue: 'cgcp-on-africa',
     }),
     defineField({
       name: 'submittedAt',

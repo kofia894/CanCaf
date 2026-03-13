@@ -90,7 +90,7 @@
     "programAreasTitle": "Como Trabalhamos",
     "ctaTitle": "Pronto para Fazer a Diferença?",
     "ctaDesc": "Junte-se ao nosso programa principal ou torne-se parceiro para fortalecer os cuidados oncológicos em toda a África.",
-    "applyNow": "Candidatar-se ao CGCPON África",
+    "applyNow": "Candidatar-se ao CGCP-ON África",
     "partnerWithUs": "Seja Nosso Parceiro"
   },
   "partners": {
@@ -134,13 +134,19 @@
     "getInTouch": "Entre em Contacto",
     "name": "Seu Nome",
     "email": "Endereço de Email",
+    "phoneNumber": "Número de Telefone",
     "subject": "Assunto",
     "message": "Sua Mensagem",
     "send": "Enviar Mensagem",
+    "sending": "A enviar...",
     "info": "Informações de Contacto",
     "address": "Morada",
     "phone": "Telefone",
-    "emailLabel": "Email"
+    "emailLabel": "Email",
+    "successTitle": "Mensagem Enviada!",
+    "successMessage": "Obrigado por nos contactar. Recebemos a sua mensagem e responderemos o mais breve possível.",
+    "sendAnother": "Enviar Outra Mensagem",
+    "errorMessage": "Algo correu mal. Por favor, tente novamente mais tarde."
   },
   "donate": {
     "tag": "Doar",
@@ -215,11 +221,11 @@
   },
   "cgcpOnAfrica": {
     "tag": "Programa de Certificação",
-    "title": "CGCPON África: Programa de Certificação em Aconselhamento Genético Oncológico para Enfermeiras",
+    "title": "CGCP-ON África: Programa de Certificação em Aconselhamento Genético Oncológico para Enfermeiras",
     "subtitle": "Um programa de certificação virtual pioneiro que equipa enfermeiras oncológicas africanas com competências em aconselhamento genético oncológico.",
     "acceptingApplications": "A Aceitar Candidaturas",
     "featuredProgramme": "Programa em Destaque",
-    "newProgramme": "Novo: Candidaturas CGCPON África Abertas",
+    "newProgramme": "Novo: Candidaturas CGCP-ON África Abertas",
     "applyNow": "Candidatar-se",
     "learnAndApply": "Saber Mais e Candidatar-se",
     "deadline": "Prazo de Candidatura: 24 de Março de 2026",
@@ -228,10 +234,10 @@
     "applicationFeeAmount": "GHS 200 ou $20 USD",
     "aboutTag": "Sobre o Programa",
     "aboutTitle": "Colmatar a Lacuna do Aconselhamento Genético Oncológico em África",
-    "aboutDesc1": "O Programa de Certificação em Aconselhamento Genético Oncológico para Enfermeiras em África (CGCPON África) é uma iniciativa histórica que aborda uma lacuna crítica: aproximadamente 90% dos países africanos não têm conselheiros genéticos. Este programa virtual equipa enfermeiras oncológicas com competências fundamentais em aconselhamento genético oncológico.",
+    "aboutDesc1": "O Programa de Certificação em Aconselhamento Genético Oncológico para Enfermeiras em África (CGCP-ON África) é uma iniciativa histórica que aborda uma lacuna crítica: aproximadamente 90% dos países africanos não têm conselheiros genéticos. Este programa virtual equipa enfermeiras oncológicas com competências fundamentais em aconselhamento genético oncológico.",
     "aboutDesc2": "Possibilitado através do financiamento do Prémio Aster Guardians Global Nursing Award 2025, ganho por Naomi Oyoe Ohene Oti, este programa representa uma colaboração entre o West African Genetic Medicine Centre (WAGMC), Aster Guardians Global Nursing Award e CanCAF.",
     "whyMatters": "Porque Isto É Importante",
-    "whyMattersDesc": "Com a crescente influência da oncologia de precisão a nível mundial, há uma necessidade significativa de integrar o aconselhamento genético nos cuidados oncológicos de rotina. No entanto, a escassez de profissionais formados em África representa uma barreira significativa. O CGCPON África aborda isto formando enfermeiras oncológicas já integradas nos sistemas de cuidados oncológicos.",
+    "whyMattersDesc": "Com a crescente influência da oncologia de precisão a nível mundial, há uma necessidade significativa de integrar o aconselhamento genético nos cuidados oncológicos de rotina. No entanto, a escassez de profissionais formados em África representa uma barreira significativa. O CGCP-ON África aborda isto formando enfermeiras oncológicas já integradas nos sistemas de cuidados oncológicos.",
     "skillsTag": "O Que Vai Aprender",
     "skillsTitle": "Competências Fundamentais",
     "skills": {
@@ -272,7 +278,7 @@
       "englishProficiency": "Proficiência em inglês (falado e escrito)"
     },
     "commitment": "Compromisso Pós-Formação",
-    "commitmentDesc": "Após concluir o programa CGCPON África, espera-se que os diplomados dediquem um mínimo de 10 horas por mês a serviços de aconselhamento genético oncológico nas suas instituições ou comunidades.",
+    "commitmentDesc": "Após concluir o programa CGCP-ON África, espera-se que os diplomados dediquem um mínimo de 10 horas por mês a serviços de aconselhamento genético oncológico nas suas instituições ou comunidades.",
     "readyToApply": "Pronto para Transformar os Cuidados Oncológicos?",
     "readyToApplyDesc": "Junte-se ao grupo pioneiro de enfermeiras oncológicas a desenvolver capacidades de aconselhamento genético oncológico em toda a África.",
     "startApplication": "Iniciar Candidatura",
@@ -282,7 +288,7 @@
     "grantInfo": "Financiamento por Bolsa",
     "grantInfoDesc": "Este programa é financiado pelo Prémio Aster Guardians Global Nursing Award 2025, reconhecendo a excelência em liderança e inovação em enfermagem.",
     "ctaTitle": "Faça Parte do Grupo Pioneiro",
-    "ctaDesc": "As candidaturas para o CGCPON África estão agora abertas. Junte-se a nós no desenvolvimento de capacidades de aconselhamento genético oncológico em todo o continente.",
+    "ctaDesc": "As candidaturas para o CGCP-ON África estão agora abertas. Junte-se a nós no desenvolvimento de capacidades de aconselhamento genético oncológico em todo o continente.",
     "contactUs": "Contacte-nos",
     "courseOutline": {
       "fundamentals": "Fundamentos de Genética e Genómica",
@@ -307,7 +313,7 @@
     "tag": "Programa Principal",
     "title": "Desenvolvendo Capacidade de Cuidados Oncológicos",
     "partnershipBadge": "Em Parceria",
-    "programTitle": "CGCPON África",
+    "programTitle": "CGCP-ON África",
     "programSubtitle": "Programa de Certificação em Aconselhamento Genético Oncológico para Enfermeiras",
     "description": "A CanCAF em parceria com o West African Genetic Medicine Centre (WAGMC) e em colaboração com o Aster Guardian Global Nursing Award lança um programa pioneiro que equipa enfermeiras oncológicas africanas com competências em aconselhamento genético oncológico.",
     "learnMore": "Saber Mais e Candidatar-se",

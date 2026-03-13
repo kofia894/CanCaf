@@ -14,9 +14,9 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: 'cgcponApplicationsOpen',
-      title: 'CGCPON Applications Open',
+      title: 'CGCP-ON Applications Open',
       type: 'boolean',
-      description: 'Toggle to open or close CGCPON Africa programme applications. When disabled, the application form and page will be inaccessible.',
+      description: 'Toggle to open or close CGCP-ON Africa programme applications. When disabled, the application form and page will be inaccessible.',
       initialValue: false,
     }),
     defineField({
@@ -24,7 +24,7 @@ export const siteSettingsType = defineType({
       title: 'Applications Closed Message',
       type: 'text',
       description: 'Message to display when applications are closed',
-      initialValue: 'Applications for the CGCPON Africa programme are currently closed. Please check back later for future application periods.',
+      initialValue: 'Applications for the CGCP-ON Africa programme are currently closed. Please check back later for future application periods.',
     }),
   ],
   preview: {

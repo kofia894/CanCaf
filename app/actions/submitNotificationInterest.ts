@@ -25,7 +25,7 @@ export async function submitNotificationInterest(
       `*[_type == "notificationInterest" && email == $email && programme == $programme][0]`,
       {
         email: formData.email.toLowerCase().trim(),
-        programme: formData.programme || 'cgcpon-africa'
+        programme: formData.programme || 'cgcp-on-africa'
       }
     )
 
@@ -41,7 +41,7 @@ export async function submitNotificationInterest(
       _type: 'notificationInterest',
       name: formData.name.trim(),
       email: formData.email.toLowerCase().trim(),
-      programme: formData.programme || 'cgcpon-africa',
+      programme: formData.programme || 'cgcp-on-africa',
       submittedAt: new Date().toISOString(),
       notified: false,
     })
@@ -52,7 +52,7 @@ export async function submitNotificationInterest(
         await resend.emails.send({
           from: 'CanCAF <onboarding@resend.dev>',
           to: formData.email.toLowerCase().trim(),
-          subject: 'CGCPON Africa - Application Notification Confirmed',
+          subject: 'CGCP-ON Africa - Application Notification Confirmed',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background-color: #0F766E; padding: 24px; text-align: center;">
@@ -61,7 +61,7 @@ export async function submitNotificationInterest(
               <div style="padding: 32px; background-color: #f9fafb;">
                 <h2 style="color: #18181b; margin-top: 0;">Hello ${formData.name},</h2>
                 <p style="color: #52525b; line-height: 1.6;">
-                  Thank you for your interest in the <strong>Cancer Genetic Counselling Certificate Programme for Oncology Nurses (CGCPON Africa)</strong>.
+                  Thank you for your interest in the <strong>Cancer Genetic Counselling Certificate Programme for Oncology Nurses (CGCP-ON Africa)</strong>.
                 </p>
                 <p style="color: #52525b; line-height: 1.6;">
                   We have added you to our notification list. You will receive an email as soon as applications open for the next cohort.
@@ -72,7 +72,7 @@ export async function submitNotificationInterest(
                 <div style="text-align: center; margin: 32px 0;">
                   <a href="https://cancaf.org/programs/cgcp-on-africa"
                      style="background-color: #0F766E; color: white; padding: 12px 24px; text-decoration: none; border-radius: 9999px; font-weight: 500; display: inline-block;">
-                    Learn More About CGCPON Africa
+                    Learn More About CGCP-ON Africa
                   </a>
                 </div>
                 <p style="color: #71717a; font-size: 14px; margin-top: 32px;">

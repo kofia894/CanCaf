@@ -7,10 +7,10 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Programs',
-  description: 'Explore CanCAF programs focused on cancer care capacity building across Africa, including the flagship CGCPON Africa certificate programme for oncology nurses.',
+  description: 'Explore CanCAF programs focused on cancer care capacity building across Africa, including the flagship CGCP-ON Africa certificate programme for oncology nurses.',
   openGraph: {
     title: 'Programs - CanCAF',
-    description: 'Explore our cancer care programs including capacity building, awareness, early detection, and the flagship CGCPON Africa programme.',
+    description: 'Explore our cancer care programs including capacity building, awareness, early detection, and the flagship CGCP-ON Africa programme.',
     images: ['/home/capacitybuilding.webp'],
   },
 }
@@ -76,7 +76,7 @@ export default async function ProgramsPage() {
               <span className="text-base font-medium text-zinc-600">{t('flagshipTag')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] leading-tight mb-4">
-              CGCPON Africa
+              CGCP-ON Africa
             </h2>
             <p className="text-xl text-zinc-600 max-w-3xl mx-auto">
               Cancer Genetic Counselling Certificate Programme for Oncology Nurses

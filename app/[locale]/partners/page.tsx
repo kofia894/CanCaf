@@ -164,7 +164,7 @@ export default async function PartnersPage() {
                   href="/programs/cgcp-on-africa"
                   className="inline-flex items-center gap-2 text-[#0F766E] font-medium hover:underline"
                 >
-                  Learn about CGCPON Africa
+                  Learn about CGCP-ON Africa
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

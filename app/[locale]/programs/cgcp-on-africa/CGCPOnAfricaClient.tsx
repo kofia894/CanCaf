@@ -12,7 +12,7 @@ interface CGCPOnAfricaClientProps {
 }
 
 /**
- * CGCPON Africa Programme Page
+ * CGCP-ON Africa Programme Page
  *
  * Cancer Genetic Counselling Certificate Programme for Oncology Nurses in Africa
  * A collaboration between WAGMC, Aster Guardians Global Nursing Award, and CanCAF
@@ -105,7 +105,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
               >
-                CGCPON Africa
+                CGCP-ON Africa
               </motion.h1>
 
               {/* Subtitle */}
@@ -272,7 +272,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
                 <Image
                   src="/winningAster.webp"
-                  alt="CGCPON Africa Training"
+                  alt="CGCP-ON Africa Training"
                   fill
                   className="object-cover"
                 />

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "Cancer Care Africa Foundation",
     "oncology nurses",
     "cancer genetic counselling",
-    "CGCPON Africa",
+    "CGCP-ON Africa",
     "Ghana healthcare",
     "African healthcare",
   ],

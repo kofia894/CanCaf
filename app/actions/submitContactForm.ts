@@ -7,6 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export interface ContactFormData {
   name: string
   email: string
+  phone: string
   subject: string
   message: string
 }
@@ -21,7 +22,7 @@ export async function submitContactForm(
 ): Promise<SubmitContactFormResult> {
   try {
     // Validate required fields
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.subject || !formData.message) {
       return {
         success: false,
         message: 'Please fill in all required fields.',
@@ -53,6 +54,12 @@ export async function submitContactForm(
                   <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a;">Email:</td>
                   <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #18181b;">
                     <a href="mailto:${formData.email}" style="color: #0F766E;">${formData.email}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a;">Phone:</td>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #18181b;">
+                    <a href="tel:${formData.phone}" style="color: #0F766E;">${formData.phone}</a>
                   </td>
                 </tr>
                 <tr>

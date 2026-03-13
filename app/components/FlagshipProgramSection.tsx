@@ -9,7 +9,7 @@ import { scrollRevealProps, staggerContainer, staggerItem } from '@/lib/motion'
 /**
  * Flagship Program Section
  *
- * Features the CGCPON Africa program with partner logos
+ * Features the CGCP-ON Africa program with partner logos
  */
 export default function FlagshipProgramSection() {
   const t = useTranslations('flagshipProgram')

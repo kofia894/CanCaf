@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Applications Opening Soon - CGCPON Africa',
-  description: 'CGCPON Africa applications are currently closed. Stay updated for future application periods for the Cancer Genetic Counselling Certificate Programme.',
+  title: 'Applications Opening Soon - CGCP-ON Africa',
+  description: 'CGCP-ON Africa applications are currently closed. Stay updated for future application periods for the Cancer Genetic Counselling Certificate Programme.',
   openGraph: {
-    title: 'Applications Opening Soon - CGCPON Africa',
-    description: 'CGCPON Africa applications are currently closed. Check back soon for future application periods.',
+    title: 'Applications Opening Soon - CGCP-ON Africa',
+    description: 'CGCP-ON Africa applications are currently closed. Check back soon for future application periods.',
     images: ['/home/capacitybuilding.webp'],
   },
 }
