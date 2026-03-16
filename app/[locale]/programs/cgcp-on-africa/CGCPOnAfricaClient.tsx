@@ -94,7 +94,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                   </span>
                 )}
                 <span className="px-4 py-1.5 bg-[#F59E0B] text-white text-sm font-medium rounded-full">
-                  {t('featuredProgramme')}
+                  {t('flagshipProgramme')}
                 </span>
               </motion.div>
 
@@ -247,7 +247,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                   <strong className="text-zinc-900">CGCP‑ON Africa</strong> is CanCAF&apos;s flagship training initiative, powered by the prestigious <strong className="text-[#F59E0B]">2025 Aster Guardians Global Nursing Award</strong> received by Mrs. Naomi Oyoe Ohene Oti.
                 </p>
                 <p>
-                  Through this collaboration, <strong className="text-zinc-900">CanCAF</strong> leads the programme&apos;s vision while <strong className="text-zinc-900">WAGMC</strong> delivers the training, transforming Mrs. Ohene Oti&apos;s award-winning achievement into a continent‑wide movement advancing cancer genetic counselling for oncology nurses across Africa.
+                  Through this collaboration, <strong className="text-zinc-900">CanCAF</strong> leads the programme&apos;s vision while <strong className="text-zinc-900">WAGMC</strong> delivers the training, transforming Mrs. Ohene Oti&apos;s award-winning achievement into a continent‑wide movement advancing cancer genetic counselling for oncology nurses .
                 </p>
               </div>
 
@@ -391,7 +391,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                     <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-sm">Applications close: <strong>March 24, 2026</strong></span>
+                    <span className="text-sm">Applications close: <strong>March 27, 2026</strong></span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3 text-white/90">
@@ -407,10 +407,6 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                   </svg>
                   <span className="text-sm">Programme duration: <strong>April – June 2026</strong></span>
                 </div>
-              </div>
-
-              {/* Application Fee - Prominent */}
-              <div className="mb-6 p-4 bg-[#F59E0B]/20 rounded-xl border border-[#F59E0B]/30">
               </div>
 
               <button

@@ -132,7 +132,7 @@ export async function submitContactForm(
             <div style="background-color: #18181b; padding: 16px; text-align: center;">
               <p style="color: #a1a1aa; font-size: 12px; margin: 0;">
                 Cancer Care Africa Foundation (CanCAF)<br/>
-                Strengthening Cancer Care Across Africa
+                Strengthening Cancer Care
               </p>
             </div>
           </div>

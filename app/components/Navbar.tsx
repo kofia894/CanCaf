@@ -33,31 +33,44 @@ function NavLink({ href, children, onClick, className = '', isScrolled = false }
     <Link
       href={href as '/about' | '/programs' | '/partners' | '/news' | '/contact' | '/donate' | '/'}
       onClick={onClick}
-      className={`relative inline-block px-3 py-2 rounded-lg transition-all duration-300 focus-ring ${
-        isScrolled
-          ? 'hover:bg-zinc-100'
-          : 'hover:bg-black/10'
-      } ${className}`}
+      className={`group relative inline-block px-4 py-2 focus-ring ${className}`}
     >
-      <span className={`block whitespace-nowrap text-sm font-medium transition-colors duration-300 ${
-        isScrolled
-          ? isActive ? 'text-[#0F766E]' : 'text-zinc-700 hover:text-[#0F766E]'
-          : isActive ? 'text-[#0F766E]' : 'text-zinc-700 hover:text-[#0F766E]'
+      <span className={`relative z-10 block whitespace-nowrap text-sm font-medium transition-colors duration-300 ${
+        isActive
+          ? 'text-[#0F766E]'
+          : 'text-zinc-600 group-hover:text-zinc-900'
       }`}>
         {children}
       </span>
-      {isActive && (
-        <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-[#0F766E] transition-colors duration-300" />
-      )}
+      {/* Animated underline - scales from center on hover, full width when active */}
+      <span
+        className={`absolute bottom-1 left-1/2 h-[2px] bg-[#0F766E] transition-all duration-300 ease-out ${
+          isActive
+            ? 'w-[calc(100%-2rem)] -translate-x-1/2'
+            : 'w-0 -translate-x-1/2 group-hover:w-[calc(100%-2rem)]'
+        }`}
+      />
     </Link>
   )
 }
 
+// About section links for dropdown
+const aboutSections = [
+  { id: 'who-we-are', labelKey: 'whoWeAre' },
+  { id: 'our-origin', labelKey: 'ourOrigin' },
+  { id: 'our-purpose', labelKey: 'ourPurpose' },
+  { id: 'mission-vision', labelKey: 'missionVision' },
+  { id: 'core-values', labelKey: 'coreValues' },
+  { id: 'where-we-work', labelKey: 'whereWeWork' },
+]
+
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLanguageOpen, setIsLanguageOpen] = useState(false)
+  const [isAboutHovered, setIsAboutHovered] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const languageRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
   const t = useTranslations('nav')
   const locale = useLocale()
   const router = useRouter()
@@ -82,11 +95,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Close language dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
         setIsLanguageOpen(false)
+      }
+      if (aboutRef.current && !aboutRef.current.contains(event.target as Node)) {
+        setIsAboutHovered(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -129,7 +145,7 @@ export default function Navbar() {
 
             {/* Right side - Language Selector + Tagline */}
             <div className="flex items-center gap-4 ms-auto">
-              <span className="hidden md:inline text-white/80">Strengthening Cancer Care Across Africa</span>
+              <span className="hidden md:inline text-white/80">Strengthening Cancer Care </span>
 
               {/* Language Selector */}
               <div className="relative" ref={languageRef}>
@@ -244,7 +260,73 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
-              <NavLink href="/about" isScrolled={!showTransparent}>{t('about')}</NavLink>
+              {/* About Dropdown */}
+              <div
+                className="relative"
+                ref={aboutRef}
+                onMouseEnter={() => setIsAboutHovered(true)}
+                onMouseLeave={() => setIsAboutHovered(false)}
+              >
+                <Link
+                  href="/about"
+                  className={`group relative inline-flex items-center gap-1 px-4 py-2 focus-ring`}
+                >
+                  <span className={`relative z-10 whitespace-nowrap text-sm font-medium transition-colors duration-300 ${
+                    pathname.startsWith('/about')
+                      ? 'text-[#0F766E]'
+                      : 'text-zinc-600 group-hover:text-zinc-900'
+                  }`}>
+                    {t('about')}
+                  </span>
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      pathname.startsWith('/about') ? 'text-[#0F766E]' : 'text-zinc-400 group-hover:text-zinc-600'
+                    } ${isAboutHovered ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {/* Animated underline */}
+                  <span
+                    className={`absolute bottom-1 left-1/2 h-[2px] bg-[#0F766E] transition-all duration-300 ease-out ${
+                      pathname.startsWith('/about')
+                        ? 'w-[calc(100%-2rem)] -translate-x-1/2'
+                        : 'w-0 -translate-x-1/2 group-hover:w-[calc(100%-2rem)]'
+                    }`}
+                  />
+                </Link>
+
+                {/* About Dropdown Menu */}
+                <AnimatePresence>
+                  {isAboutHovered && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                      className="absolute left-0 top-full pt-2"
+                    >
+                      <div className="w-56 bg-white rounded-xl shadow-xl border border-zinc-100 overflow-hidden py-2">
+                        {/* Section Links */}
+                        {aboutSections.map((section) => (
+                          <Link
+                            key={section.id}
+                            href={`/about#${section.id}`}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-[#0F766E]" />
+                            {t(section.labelKey)}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <NavLink href="/programs" isScrolled={!showTransparent}>{t('programs')}</NavLink>
               <NavLink href="/partners" isScrolled={!showTransparent}>{t('partners')}</NavLink>
               <NavLink href="/news" isScrolled={!showTransparent}>{t('news')}</NavLink>

@@ -50,7 +50,7 @@ export interface NewsItem {
 }
 
 // Query for latest 3 news items (home page)
-export const LATEST_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc)[0...3]{
+export const LATEST_NEWS_QUERY = `*[_type == "news"] | order(order asc)[0...3]{
   _id,
   title,
   slug,
@@ -59,7 +59,7 @@ export const LATEST_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc)[0
 }`;
 
 // Query for all news items (news page)
-export const ALL_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc){
+export const ALL_NEWS_QUERY = `*[_type == "news"] | order(order asc){
   _id,
   title,
   slug,
@@ -68,7 +68,7 @@ export const ALL_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc){
 }`;
 
 // Query for paginated news items
-export const PAGINATED_NEWS_QUERY = `*[_type == "news"] | order(publishedAt desc)[$start...$end]{
+export const PAGINATED_NEWS_QUERY = `*[_type == "news"] | order(order asc)[$start...$end]{
   _id,
   title,
   slug,

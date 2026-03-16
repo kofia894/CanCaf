@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Donate',
-  description: 'Support CanCAF\'s mission to strengthen cancer care capacity across Africa. Your donation helps train healthcare workers and reach communities with cancer prevention and screening.',
+  description: 'Support CanCAF\'s mission to strengthen cancer care capacity . Your donation helps train healthcare workers and reach communities with cancer prevention and screening.',
   openGraph: {
     title: 'Donate - Support Cancer Care in Africa',
     description: 'Your donation helps train healthcare workers and reach communities with cancer prevention and screening.',

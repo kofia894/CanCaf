@@ -48,7 +48,7 @@ export default function AboutClient() {
       />
 
       {/* Who We Are Section */}
-      <section className="py-20 md:py-28 bg-white">
+      <section id="who-we-are" className="py-20 md:py-28 bg-white scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <motion.div
@@ -90,7 +90,7 @@ export default function AboutClient() {
       </section>
 
       {/* Our Origin Section */}
-      <section className="py-20 md:py-28 bg-zinc-50">
+      <section id="our-origin" className="py-20 md:py-28 bg-zinc-50 scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -216,7 +216,7 @@ export default function AboutClient() {
       </section>
 
       {/* Our Purpose Section */}
-      <section className="py-20 md:py-28 bg-[#0F766E]">
+      <section id="our-purpose" className="py-20 md:py-28 bg-[#0F766E] scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="max-w-4xl mx-auto text-center"
@@ -243,7 +243,7 @@ export default function AboutClient() {
       </section>
 
       {/* Mission & Vision Section */}
-      <section className="py-20 md:py-28 bg-white">
+      <section id="mission-vision" className="py-20 md:py-28 bg-white scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-16"
@@ -309,7 +309,7 @@ export default function AboutClient() {
       </section>
 
       {/* Core Values Section */}
-      <section className="py-20 md:py-28 bg-zinc-50">
+      <section id="core-values" className="py-20 md:py-28 bg-zinc-50 scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-16"
@@ -361,7 +361,7 @@ export default function AboutClient() {
       </section>
 
       {/* Advisory Board Section */}
-      <section className="py-20 md:py-28 bg-white">
+      {/* <section className="py-20 md:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-16"
@@ -382,7 +382,6 @@ export default function AboutClient() {
             </p>
           </motion.div>
 
-          {/* Advisory Board Member Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { name: 'Member Name', role: 'Position Title', image: '' },
@@ -398,7 +397,6 @@ export default function AboutClient() {
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: index * 0.1 }}
               >
-                {/* Image Placeholder */}
                 <div className="relative aspect-[4/5] bg-gradient-to-br from-zinc-100 to-zinc-200 overflow-hidden">
                   {member.image ? (
                     <Image
@@ -416,11 +414,9 @@ export default function AboutClient() {
                       </div>
                     </div>
                   )}
-                  {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
-                {/* Member Info */}
                 <div className="p-6 text-center">
                   <h3 className="text-lg font-semibold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-1">
                     {member.name}
@@ -433,10 +429,10 @@ export default function AboutClient() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Where We Work Section */}
-      <section className="py-20 md:py-28 bg-zinc-50">
+      <section id="where-we-work" className="py-20 md:py-28 bg-zinc-50 scroll-mt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <motion.div

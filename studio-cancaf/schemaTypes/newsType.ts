@@ -17,8 +17,18 @@ export const newsType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      description: 'Lower numbers appear first. Used to control the order of news articles.',
+      initialValue: 0,
+      validation: (rule) => rule.required().integer(),
+    }),
+    defineField({
       name: 'publishedAt',
+      title: 'Published Date',
       type: 'datetime',
+      description: 'Display date for the article (does not affect ordering)',
       initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),

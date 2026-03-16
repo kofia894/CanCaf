@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: "CanCAF - Cancer Care Africa Foundation",
     template: "%s | CanCAF",
   },
-  description: "CanCAF (Cancer Care Africa Foundation) is dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building initiatives.",
+  description: "CanCAF (Cancer Care Africa Foundation) is dedicated to strengthening cancer care capacity through training, awareness, partnerships, and capacity building initiatives.",
   keywords: [
     "cancer care",
     "Africa",
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "CanCAF - Cancer Care Africa Foundation",
-    title: "CanCAF - Strengthening Cancer Care Across Africa",
-    description: "CanCAF is dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building initiatives.",
+    title: "CanCAF - Strengthening Cancer Care",
+    description: "CanCAF is dedicated to strengthening cancer care capacity through training, awareness, partnerships, and capacity building initiatives.",
     images: [
       {
         url: "/og-image.png",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "CanCAF - Cancer Care Africa Foundation",
-    description: "Strengthening Cancer Care Capacity Across Africa",
+    description: "Strengthening Cancer Care Capacity",
     creator: "@CCancaf",
     site: "@CCancaf",
     images: ["/og-image.png"],

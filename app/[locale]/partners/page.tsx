@@ -7,10 +7,10 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Partners & Supporters',
-  description: 'Meet our partners and supporters who help CanCAF strengthen cancer care across Africa. Join our growing network of healthcare institutions, NGOs, and development organizations.',
+  description: 'Meet our partners and supporters who help CanCAF strengthen cancer care . Join our growing network of healthcare institutions, NGOs, and development organizations.',
   openGraph: {
     title: 'Partners & Supporters - CanCAF',
-    description: 'Meet our partners and supporters who help strengthen cancer care across Africa.',
+    description: 'Meet our partners and supporters who help strengthen cancer care .',
     images: ['/home/innandresearch.webp'],
   },
 }

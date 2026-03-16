@@ -6,11 +6,11 @@ import ImpactStatsSection from "../components/ImpactStatsSection";
 import { client, LATEST_NEWS_QUERY, fetchOptions, NewsItem } from "@/app/lib/sanity";
 
 export const metadata: Metadata = {
-  title: "CanCAF - Strengthening Cancer Care Across Africa",
-  description: "CanCAF (Cancer Care Africa Foundation) is dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building initiatives.",
+  title: "CanCAF - Strengthening Cancer Care",
+  description: "CanCAF (Cancer Care Africa Foundation) is dedicated to strengthening cancer care capacity through training, awareness, partnerships, and capacity building initiatives.",
   openGraph: {
-    title: "CanCAF - Strengthening Cancer Care Across Africa",
-    description: "Dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building.",
+    title: "CanCAF - Strengthening Cancer Care",
+    description: "Dedicated to strengthening cancer care capacity through training, awareness, partnerships, and capacity building.",
     type: "website",
   },
 };

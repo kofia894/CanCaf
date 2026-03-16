@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'CanCAF - Cancer Care Africa Foundation',
     short_name: 'CanCAF',
-    description: 'Strengthening Cancer Care Capacity Across Africa',
+    description: 'Strengthening Cancer Care Capacity',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

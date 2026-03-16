@@ -31,7 +31,7 @@ const focusAreas = [
   },
   {
     title: 'Cancer Awareness & Early Detection',
-    description: 'We promote education and community engagement to improve cancer prevention, screening uptake, and early detection across Africa.',
+    description: 'We promote education and community engagement to improve cancer prevention, screening uptake, and early detection .',
     image: '/home/ealydetect.webp',
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ const focusAreas = [
   },
   {
     title: 'Advocacy & Policy Engagement',
-    description: 'We engage with policymakers and stakeholders to advocate for cancer care policies that prioritize equitable access to services across Africa.',
+    description: 'We engage with policymakers and stakeholders to advocate for cancer care policies that prioritize equitable access to services .',
     image: '/home/advocacy.webp',
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@ const focusAreas = [
   },
   {
     title: 'Lasting Impact',
-    description: 'We are committed to creating sustainable change that transforms cancer care systems and improves outcomes for communities across Africa.',
+    description: 'We are committed to creating sustainable change that transforms cancer care systems and improves outcomes for communities .',
     image: '/home/home2.webp',
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

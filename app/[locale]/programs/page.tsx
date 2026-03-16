@@ -7,7 +7,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Programs',
-  description: 'Explore CanCAF programs focused on cancer care capacity building across Africa, including the flagship CGCP-ON Africa certificate programme for oncology nurses.',
+  description: 'Explore CanCAF programs focused on cancer care capacity building , including the flagship CGCP-ON Africa certificate programme for oncology nurses.',
   openGraph: {
     title: 'Programs - CanCAF',
     description: 'Explore our cancer care programs including capacity building, awareness, early detection, and the flagship CGCP-ON Africa programme.',
@@ -136,7 +136,7 @@ export default async function ProgramsPage() {
                     {tCgcp('acceptingApplications')}
                   </span>
                   <span className="px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full">
-                    {tCgcp('featuredProgramme')}
+                    {tCgcp('flagshipProgramme')}
                   </span>
                 </div>
 

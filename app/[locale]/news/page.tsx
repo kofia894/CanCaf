@@ -8,7 +8,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'News & Activities',
-  description: 'Stay updated with the latest news, events, and activities from CanCAF. Read about our work strengthening cancer care across Africa.',
+  description: 'Stay updated with the latest news, events, and activities from CanCAF. Read about our work strengthening cancer care .',
   openGraph: {
     title: 'News & Activities - CanCAF',
     description: 'Stay updated with the latest news, events, and activities from CanCAF.',

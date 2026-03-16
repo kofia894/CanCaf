@@ -15,7 +15,7 @@ export function OrganizationJsonLd() {
       height: 95,
     },
     image: `${siteUrl}/og-image.png`,
-    description: 'CanCAF is dedicated to strengthening cancer care capacity across Africa through training, awareness, partnerships, and capacity building initiatives.',
+    description: 'CanCAF is dedicated to strengthening cancer care capacity  through training, awareness, partnerships, and capacity building initiatives.',
     email: 'info@cancaf.org',
     telephone: '+233593443344',
     address: {
@@ -41,7 +41,7 @@ export function OrganizationJsonLd() {
       'Healthcare Training',
       'Cancer Genetic Counselling',
     ],
-    slogan: 'Strengthening Cancer Care Across Africa',
+    slogan: 'Strengthening Cancer Care ',
   }
 
   return (
@@ -59,7 +59,7 @@ export function WebsiteJsonLd() {
     '@id': `${siteUrl}/#website`,
     url: siteUrl,
     name: 'CanCAF - Cancer Care Africa Foundation',
-    description: 'Strengthening Cancer Care Capacity Across Africa',
+    description: 'Strengthening Cancer Care Capacity ',
     publisher: {
       '@id': `${siteUrl}/#organization`,
     },

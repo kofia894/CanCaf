@@ -5,7 +5,7 @@ import ContactForm from '../../components/ContactForm'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with CanCAF. Contact us for partnerships, inquiries about our programs, or to learn more about strengthening cancer care across Africa.',
+  description: 'Get in touch with CanCAF. Contact us for partnerships, inquiries about our programs, or to learn more about strengthening cancer care .',
   openGraph: {
     title: 'Contact CanCAF',
     description: 'Get in touch with us for partnerships, program inquiries, or to learn more about our work.',

@@ -33,7 +33,7 @@ export const translations = {
 
     // Hero
     'hero.tag': 'Together for Better Cancer Care',
-    'hero.title': 'Strengthening Cancer Care Across Africa',
+    'hero.title': 'Strengthening Cancer Care ',
     'hero.subtitle': 'Building capacity, raising awareness, and fostering partnerships for better cancer prevention, detection, and treatment.',
     'hero.cta': 'Learn More',
     'hero.ctaSecondary': 'Donate Now',
@@ -43,14 +43,14 @@ export const translations = {
     'about.title': 'Driven By Purpose And Impact',
     'about.mission': 'Our Mission',
     'about.missionTitle': 'Together for Lasting Hope and Health',
-    'about.missionText': 'Cancer Care Africa Foundation (CanCAF) is committed to strengthening cancer control systems across Africa through capacity building, awareness, advocacy, policy engagement, and strategic partnerships to improve prevention, early detection, treatment, and survivorship.',
+    'about.missionText': 'Cancer Care Africa Foundation (CanCAF) is committed to strengthening cancer control systems  through capacity building, awareness, advocacy, policy engagement, and strategic partnerships to improve prevention, early detection, treatment, and survivorship.',
     'about.vision': 'Our Vision',
     'about.visionTitle': 'Quality Cancer Care for All Africans',
     'about.visionText': 'A future where every person in Africa has access to quality cancer prevention, early detection, treatment, and compassionate care.',
 
     // Programs
     'programs.tag': 'Programs',
-    'programs.title': 'Transforming Cancer Care Across Africa',
+    'programs.title': 'Transforming Cancer Care ',
     'programs.subtitle': 'Strategic initiatives driving meaningful change in cancer prevention, detection, and treatment.',
 
     // Partners
@@ -69,10 +69,10 @@ export const translations = {
     // Donate
     'donate.tag': 'Donate',
     'donate.title': 'Your Support Powers Life-Changing Missions',
-    'donate.subtitle': 'Every contribution helps us build stronger cancer care systems and save lives across Africa.',
+    'donate.subtitle': 'Every contribution helps us build stronger cancer care systems and save lives .',
 
     // Footer
-    'footer.tagline': 'Strengthening cancer care capacity across Africa.',
+    'footer.tagline': 'Strengthening cancer care capacity .',
     'footer.quickLinks': 'Quick Links',
     'footer.connect': 'Connect With Us',
     'footer.rights': 'All rights reserved.',
