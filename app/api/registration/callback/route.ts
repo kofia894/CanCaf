@@ -116,10 +116,14 @@ export async function GET(request: NextRequest) {
   }
 
   const authString = Buffer.from(`${hubtelClientId}:${hubtelClientSecret}`).toString('base64')
+  const statusUrl = `https://api-txnstatus.hubtel.com/transactions/${hubtelMerchantAccountNumber}/status?clientReference=${clientReference}`
+
+  console.log('Status Check URL:', statusUrl)
+  console.log('Merchant Account Number:', hubtelMerchantAccountNumber)
 
   try {
     const statusResponse = await fetch(
-      `https://api-txnstatus.hubtel.com/transactions/${hubtelMerchantAccountNumber}/status?clientReference=${clientReference}`,
+      statusUrl,
       {
         method: 'GET',
         headers: {
@@ -127,6 +131,20 @@ export async function GET(request: NextRequest) {
         },
       }
     )
+
+    console.log('Hubtel Response Status:', statusResponse.status)
+    console.log('Hubtel Response OK:', statusResponse.ok)
+
+    // Check if response is OK before parsing
+    if (!statusResponse.ok) {
+      const errorText = await statusResponse.text()
+      console.error('Hubtel API Error Response:', errorText)
+      return NextResponse.json({
+        success: false,
+        error: `Hubtel API returned ${statusResponse.status}`,
+        details: errorText.substring(0, 500), // First 500 chars for debugging
+      })
+    }
 
     const statusData = await statusResponse.json()
 
