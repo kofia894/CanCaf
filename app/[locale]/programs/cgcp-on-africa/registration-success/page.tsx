@@ -227,7 +227,7 @@ function RegistrationSuccessContent() {
               </svg>
             </Link>
 
-            {/* Manual Status Check Button for debugging */}
+            {/* Manual Status Check Button for debugging - commented out
             <button
               onClick={triggerManualStatusCheck}
               disabled={isCheckingStatus || !registrationData?.clientReference}
@@ -248,7 +248,6 @@ function RegistrationSuccessContent() {
               )}
             </button>
 
-            {/* Status Check Result */}
             {statusCheckResult && (
               <div className="mt-4 p-4 bg-zinc-100 rounded-xl text-left">
                 <p className="text-xs font-medium text-zinc-500 mb-2">Hubtel Status Check Response:</p>
@@ -257,6 +256,7 @@ function RegistrationSuccessContent() {
                 </pre>
               </div>
             )}
+            */}
 
             {registrationData?.clientReference && (
               <p className="text-xs text-zinc-400 mt-2">
