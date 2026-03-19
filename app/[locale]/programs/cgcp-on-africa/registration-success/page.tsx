@@ -79,8 +79,10 @@ function RegistrationSuccessContent() {
         }
       } else if (data.exists && data.clientReference) {
         setStatus('pending')
-        // Start polling if we have a client reference and haven't exceeded attempts
+        // Immediately check transaction status when we first detect a pending payment
         if (!isPolling && pollAttempt < maxPollAttempts) {
+          // Trigger immediate status check
+          checkTransactionStatus(data.clientReference)
           setIsPolling(true)
         }
       } else if (data.exists) {
