@@ -218,7 +218,7 @@ function RegistrationSuccessContent() {
             )}
 
             <Link
-              href="/programs/cgcp-on-africa"
+              href={`/programs/cgcp-on-africa?apply=true&email=${encodeURIComponent(email || '')}`}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] w-full"
             >
               Proceed to Application

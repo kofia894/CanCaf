@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/routing'
@@ -29,6 +30,7 @@ interface RegistrationStatus {
 export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }: CGCPOnAfricaClientProps) {
   const t = useTranslations('cgcpOnAfrica')
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // Application flow states
   const [currentStep, setCurrentStep] = useState<'landing' | 'registration' | 'form'>('landing')
@@ -38,6 +40,41 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
   const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
   const [registrationError, setRegistrationError] = useState('')
   const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus | null>(null)
+
+  // Check URL params on mount - if coming from payment success, go directly to form
+  useEffect(() => {
+    const applyParam = searchParams.get('apply')
+    const emailParam = searchParams.get('email')
+
+    if (applyParam === 'true' && emailParam && applicationsOpen) {
+      // Verify the email is actually paid before showing form
+      const verifyAndShowForm = async () => {
+        try {
+          const response = await fetch('/api/registration/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailParam.toLowerCase() }),
+          })
+          const data = await response.json()
+
+          if (data.paid) {
+            setRegistrationEmail(emailParam)
+            setRegistrationStatus(data)
+            setCurrentStep('form')
+          } else {
+            // Not paid, show registration step
+            setRegistrationEmail(emailParam)
+            setCurrentStep('registration')
+          }
+        } catch {
+          // On error, show registration step
+          setRegistrationEmail(emailParam)
+          setCurrentStep('registration')
+        }
+      }
+      verifyAndShowForm()
+    }
+  }, [searchParams, applicationsOpen])
 
   const handleApplyClick = () => {
     if (applicationsOpen) {
