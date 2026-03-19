@@ -24,7 +24,13 @@ export async function POST(request: NextRequest) {
   try {
     const body: HubtelCallback = await request.json()
 
-    console.log('Hubtel Callback received:', JSON.stringify(body, null, 2))
+    // ============ HUBTEL UAT: CALLBACK SAMPLE ============
+    console.log('========================================')
+    console.log('HUBTEL CALLBACK RECEIVED')
+    console.log('Timestamp:', new Date().toISOString())
+    console.log('Raw Callback Data:')
+    console.log(JSON.stringify(body, null, 2))
+    console.log('========================================')
 
     const { ResponseCode, Status, Data } = body
 
@@ -123,6 +129,15 @@ export async function GET(request: NextRequest) {
     )
 
     const statusData = await statusResponse.json()
+
+    // ============ HUBTEL UAT: STATUS CHECK SAMPLE ============
+    console.log('========================================')
+    console.log('HUBTEL TRANSACTION STATUS CHECK')
+    console.log('Timestamp:', new Date().toISOString())
+    console.log('Client Reference:', clientReference)
+    console.log('Raw Status Response:')
+    console.log(JSON.stringify(statusData, null, 2))
+    console.log('========================================')
 
     if (statusData.responseCode === '0000') {
       return NextResponse.json({
