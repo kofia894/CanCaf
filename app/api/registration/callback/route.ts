@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Transaction status check endpoint
+// Transaction status check endpoint (using public RMSC API - no IP whitelisting required)
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const clientReference = searchParams.get('ref')
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Check transaction status with Hubtel
+  // Check transaction status with Hubtel public API
   const hubtelClientId = process.env.HUBTEL_CLIENT_ID
   const hubtelClientSecret = process.env.HUBTEL_CLIENT_SECRET
   const hubtelMerchantAccountNumber = process.env.HUBTEL_MERCHANT_ACCOUNT_NUMBER
@@ -116,10 +116,8 @@ export async function GET(request: NextRequest) {
   }
 
   const authString = Buffer.from(`${hubtelClientId}:${hubtelClientSecret}`).toString('base64')
-  const statusUrl = `https://api-txnstatus.hubtel.com/transactions/${hubtelMerchantAccountNumber}/status?clientReference=${clientReference}`
-
-  console.log('Status Check URL:', statusUrl)
-  console.log('Merchant Account Number:', hubtelMerchantAccountNumber)
+  // Public RMSC API - no IP whitelisting required
+  const statusUrl = `https://rmsc.hubtel.com/v1/merchantaccount/merchants/${hubtelMerchantAccountNumber}/transactions/status?clientReference=${clientReference}`
 
   try {
     const statusResponse = await fetch(
@@ -132,30 +130,17 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    console.log('Hubtel Response Status:', statusResponse.status)
-    console.log('Hubtel Response OK:', statusResponse.ok)
-
     // Check if response is OK before parsing
     if (!statusResponse.ok) {
       const errorText = await statusResponse.text()
-      console.error('Hubtel API Error Response:', errorText)
+      console.error('Hubtel API Error:', errorText)
       return NextResponse.json({
         success: false,
         error: `Hubtel API returned ${statusResponse.status}`,
-        details: errorText.substring(0, 500), // First 500 chars for debugging
       })
     }
 
     const statusData = await statusResponse.json()
-
-    // ============ HUBTEL: REGISTRATION STATUS CHECK ============
-    console.log('========================================')
-    console.log('HUBTEL REGISTRATION TRANSACTION STATUS CHECK')
-    console.log('Timestamp:', new Date().toISOString())
-    console.log('Client Reference:', clientReference)
-    console.log('Raw Status Response:')
-    console.log(JSON.stringify(statusData, null, 2))
-    console.log('========================================')
 
     // Store status check response in Sanity
     const registrationQuery = `*[_type == "applicationRegistration" && clientReference == $ref][0]._id`
@@ -166,45 +151,41 @@ export async function GET(request: NextRequest) {
         await writeClient.patch(registrationId).set({
           hubtelStatusCheckResponse: JSON.stringify(statusData),
         }).commit()
-        console.log(`Status check response stored for registration ${clientReference}`)
       } catch (sanityError) {
         console.error('Failed to store status check response in Sanity:', sanityError)
       }
     }
 
-    if (statusData.responseCode === '0000') {
-      // If status check shows paid but registration isn't marked paid, update it
-      if (statusData.data?.status === 'Paid' && registrationId) {
-        const registration = await client.fetch(
-          `*[_type == "applicationRegistration" && _id == $id][0]{ paymentStatus }`,
-          { id: registrationId }
-        )
+    // RMSC API returns different response structure
+    // Check if transaction is successful based on the response
+    const transactionStatus = statusData.transactionStatus || statusData.status
+    const isPaid = transactionStatus === 'Success' || transactionStatus === 'Paid'
 
-        if (registration?.paymentStatus !== 'paid') {
-          try {
-            await writeClient.patch(registrationId).set({
-              paymentStatus: 'paid',
-              transactionId: statusData.data.transactionId,
-              paidAt: new Date().toISOString(),
-            }).commit()
-            console.log(`Registration ${clientReference} marked as paid via status check`)
-          } catch (updateError) {
-            console.error('Failed to update registration status:', updateError)
-          }
+    if (isPaid && registrationId) {
+      const registration = await client.fetch(
+        `*[_type == "applicationRegistration" && _id == $id][0]{ paymentStatus }`,
+        { id: registrationId }
+      )
+
+      if (registration?.paymentStatus !== 'paid') {
+        try {
+          await writeClient.patch(registrationId).set({
+            paymentStatus: 'paid',
+            transactionId: statusData.transactionId || statusData.hubtelTransactionId,
+            paidAt: new Date().toISOString(),
+          }).commit()
+        } catch (updateError) {
+          console.error('Failed to update registration status:', updateError)
         }
       }
-
-      return NextResponse.json({
-        success: true,
-        status: statusData.data.status,
-        amount: statusData.data.amount,
-        transactionId: statusData.data.transactionId,
-      })
     }
 
     return NextResponse.json({
-      success: false,
-      message: statusData.message,
+      success: isPaid,
+      status: transactionStatus,
+      amount: statusData.amount,
+      transactionId: statusData.transactionId || statusData.hubtelTransactionId,
+      rawResponse: statusData,
     })
 
   } catch (error) {

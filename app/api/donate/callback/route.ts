@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Also handle GET for status check endpoint
+// Transaction status check endpoint (using public RMSC API - no IP whitelisting required)
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const clientReference = searchParams.get('ref')
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Check transaction status with Hubtel
+  // Check transaction status with Hubtel public API
   const hubtelClientId = process.env.HUBTEL_CLIENT_ID
   const hubtelClientSecret = process.env.HUBTEL_CLIENT_SECRET
   const hubtelMerchantAccountNumber = process.env.HUBTEL_MERCHANT_ACCOUNT_NUMBER
@@ -116,10 +116,12 @@ export async function GET(request: NextRequest) {
   }
 
   const authString = Buffer.from(`${hubtelClientId}:${hubtelClientSecret}`).toString('base64')
+  // Public RMSC API - no IP whitelisting required
+  const statusUrl = `https://rmsc.hubtel.com/v1/merchantaccount/merchants/${hubtelMerchantAccountNumber}/transactions/status?clientReference=${clientReference}`
 
   try {
     const statusResponse = await fetch(
-      `https://api-txnstatus.hubtel.com/transactions/${hubtelMerchantAccountNumber}/status?clientReference=${clientReference}`,
+      statusUrl,
       {
         method: 'GET',
         headers: {
@@ -128,16 +130,17 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const statusData = await statusResponse.json()
+    // Check if response is OK before parsing
+    if (!statusResponse.ok) {
+      const errorText = await statusResponse.text()
+      console.error('Hubtel API Error:', errorText)
+      return NextResponse.json({
+        success: false,
+        error: `Hubtel API returned ${statusResponse.status}`,
+      })
+    }
 
-    // ============ HUBTEL: DONATION STATUS CHECK ============
-    console.log('========================================')
-    console.log('HUBTEL DONATION TRANSACTION STATUS CHECK')
-    console.log('Timestamp:', new Date().toISOString())
-    console.log('Client Reference:', clientReference)
-    console.log('Raw Status Response:')
-    console.log(JSON.stringify(statusData, null, 2))
-    console.log('========================================')
+    const statusData = await statusResponse.json()
 
     // Store status check response in Sanity
     const donationQuery = `*[_type == "donation" && clientReference == $ref][0]._id`
@@ -148,49 +151,45 @@ export async function GET(request: NextRequest) {
         await writeClient.patch(donationId).set({
           hubtelStatusCheckResponse: JSON.stringify(statusData),
         }).commit()
-        console.log(`Status check response stored for donation ${clientReference}`)
       } catch (sanityError) {
         console.error('Failed to store status check response in Sanity:', sanityError)
       }
     }
 
-    if (statusData.responseCode === '0000') {
-      // If status check shows paid but donation isn't marked successful, update it
-      if (statusData.data?.status === 'Paid' && donationId) {
-        const donation = await client.fetch(
-          `*[_type == "donation" && _id == $id][0]{ status }`,
-          { id: donationId }
-        )
+    // RMSC API returns different response structure
+    // Check if transaction is successful based on the response
+    const transactionStatus = statusData.transactionStatus || statusData.status
+    const isPaid = transactionStatus === 'Success' || transactionStatus === 'Paid'
 
-        if (donation?.status !== 'successful') {
-          try {
-            await writeClient.patch(donationId).set({
-              status: 'successful',
-              transactionId: statusData.data.transactionId,
-              paidAt: new Date().toISOString(),
-            }).commit()
-            console.log(`Donation ${clientReference} marked as successful via status check`)
-          } catch (updateError) {
-            console.error('Failed to update donation status:', updateError)
-          }
+    if (isPaid && donationId) {
+      const donation = await client.fetch(
+        `*[_type == "donation" && _id == $id][0]{ status }`,
+        { id: donationId }
+      )
+
+      if (donation?.status !== 'successful') {
+        try {
+          await writeClient.patch(donationId).set({
+            status: 'successful',
+            transactionId: statusData.transactionId || statusData.hubtelTransactionId,
+            paidAt: new Date().toISOString(),
+          }).commit()
+        } catch (updateError) {
+          console.error('Failed to update donation status:', updateError)
         }
       }
-
-      return NextResponse.json({
-        success: true,
-        status: statusData.data.status,
-        amount: statusData.data.amount,
-        transactionId: statusData.data.transactionId,
-      })
     }
 
     return NextResponse.json({
-      success: false,
-      message: statusData.message,
+      success: isPaid,
+      status: transactionStatus,
+      amount: statusData.amount,
+      transactionId: statusData.transactionId || statusData.hubtelTransactionId,
+      rawResponse: statusData,
     })
 
   } catch (error) {
-    console.error('Status check error:', error)
+    console.error('Donation status check error:', error)
     return NextResponse.json(
       { error: 'Failed to check status' },
       { status: 500 }
