@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/routing'
@@ -9,6 +9,14 @@ import ApplicationForm from '../../../components/ApplicationForm'
 
 interface CGCPOnAfricaClientProps {
   applicationsOpen: boolean
+  registrationFee: number
+}
+
+interface RegistrationStatus {
+  exists: boolean
+  paid: boolean
+  phone?: string
+  paidAt?: string
 }
 
 /**
@@ -18,17 +26,128 @@ interface CGCPOnAfricaClientProps {
  * A collaboration between WAGMC, Aster Guardians Global Nursing Award, and CanCAF
  */
 
-export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaClientProps) {
+export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }: CGCPOnAfricaClientProps) {
   const t = useTranslations('cgcpOnAfrica')
   const router = useRouter()
-  const [showApplicationForm, setShowApplicationForm] = useState(false)
+
+  // Application flow states
+  const [currentStep, setCurrentStep] = useState<'landing' | 'registration' | 'form'>('landing')
+  const [registrationEmail, setRegistrationEmail] = useState('')
+  const [registrationPhone, setRegistrationPhone] = useState('')
+  const [isCheckingRegistration, setIsCheckingRegistration] = useState(false)
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
+  const [registrationError, setRegistrationError] = useState('')
+  const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus | null>(null)
 
   const handleApplyClick = () => {
     if (applicationsOpen) {
-      setShowApplicationForm(true)
+      setCurrentStep('registration')
     } else {
       router.push('/programs/cgcp-on-africa/applications-closed')
     }
+  }
+
+  // Check registration status when email changes (with debounce)
+  const checkRegistrationStatus = async (email: string) => {
+    if (!email || !email.includes('@')) return
+
+    setIsCheckingRegistration(true)
+    setRegistrationError('')
+
+    try {
+      const response = await fetch('/api/registration/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase() }),
+      })
+
+      const data = await response.json()
+      setRegistrationStatus(data)
+
+      // If already paid, pre-fill phone if available
+      if (data.paid && data.phone) {
+        setRegistrationPhone(data.phone)
+      }
+    } catch {
+      setRegistrationError('Failed to check registration status')
+    } finally {
+      setIsCheckingRegistration(false)
+    }
+  }
+
+  // Debounce email check
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (registrationEmail) {
+        checkRegistrationStatus(registrationEmail)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [registrationEmail])
+
+  const handleRegistrationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setRegistrationError('')
+
+    // Basic validation
+    if (!registrationEmail || !registrationEmail.includes('@')) {
+      setRegistrationError('Please enter a valid email address')
+      return
+    }
+
+    if (!registrationPhone || registrationPhone.length < 10) {
+      setRegistrationError('Please enter a valid phone number')
+      return
+    }
+
+    // If already paid, go directly to form
+    if (registrationStatus?.paid) {
+      setCurrentStep('form')
+      return
+    }
+
+    // Initiate payment
+    setIsInitiatingPayment(true)
+
+    try {
+      const response = await fetch('/api/registration/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: registrationEmail.toLowerCase(),
+          phone: registrationPhone,
+        }),
+      })
+
+      const data = await response.json()
+
+      // Handle case where user already paid (race condition or manual URL access)
+      if (data.alreadyPaid) {
+        setRegistrationStatus({ exists: true, paid: true })
+        setCurrentStep('form')
+        return
+      }
+
+      if (data.success && data.checkoutUrl) {
+        // Redirect to Hubtel payment page
+        window.location.href = data.checkoutUrl
+      } else {
+        setRegistrationError(data.error || 'Failed to initiate payment')
+      }
+    } catch {
+      setRegistrationError('Failed to initiate payment. Please try again.')
+    } finally {
+      setIsInitiatingPayment(false)
+    }
+  }
+
+  const handleBackToLanding = () => {
+    setCurrentStep('landing')
+    setRegistrationEmail('')
+    setRegistrationPhone('')
+    setRegistrationStatus(null)
+    setRegistrationError('')
   }
 
   const courseTopics = [
@@ -53,8 +172,170 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
     'englishProficiency',
   ]
 
-  if (showApplicationForm) {
-    return <ApplicationForm onBack={() => setShowApplicationForm(false)} />
+  // Show application form if registration is paid
+  if (currentStep === 'form') {
+    return <ApplicationForm onBack={handleBackToLanding} />
+  }
+
+  // Show registration step
+  if (currentStep === 'registration') {
+    return (
+      <div className="min-h-screen bg-zinc-50 pt-32 md:pt-40 pb-12 md:pb-20">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-2xl shadow-xl p-8 border border-zinc-200"
+          >
+            {/* Back button */}
+            <button
+              onClick={handleBackToLanding}
+              className="flex items-center gap-2 text-zinc-600 hover:text-zinc-900 mb-6 motion-fast"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              Back
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-[#0F766E]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-2">
+                Application Registration
+              </h1>
+              <p className="text-zinc-600 text-sm">
+                Register to access the CGCP-ON Africa application form
+              </p>
+            </div>
+
+            {/* Registration Fee Info */}
+            <div className="bg-[#F59E0B]/10 rounded-xl p-4 mb-6 border border-[#F59E0B]/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#F59E0B] rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-semibold text-zinc-900">Registration Fee: GHS {registrationFee}</p>
+                  <p className="text-xs text-zinc-600">One-time payment for application access</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Registration Form */}
+            <form onSubmit={handleRegistrationSubmit} className="space-y-5">
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={registrationEmail}
+                  onChange={(e) => setRegistrationEmail(e.target.value)}
+                  placeholder="your.email@example.com"
+                  className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
+                  required
+                />
+                {isCheckingRegistration && (
+                  <p className="mt-1.5 text-xs text-zinc-500 flex items-center gap-1">
+                    <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Checking registration...
+                  </p>
+                )}
+                {registrationStatus?.paid && (
+                  <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Registration already paid! Continue to access the form.
+                  </p>
+                )}
+              </div>
+
+              {/* Phone Field */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={registrationPhone}
+                  onChange={(e) => setRegistrationPhone(e.target.value)}
+                  placeholder="0241234567"
+                  className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
+                  required
+                  disabled={registrationStatus?.paid}
+                />
+                <p className="mt-1 text-xs text-zinc-500">
+                  {registrationStatus?.paid
+                    ? 'Phone number from your registration'
+                    : 'Mobile money number for payment'}
+                </p>
+              </div>
+
+              {/* Error Message */}
+              {registrationError && (
+                <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  {registrationError}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isInitiatingPayment || isCheckingRegistration}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isInitiatingPayment ? (
+                  <>
+                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : registrationStatus?.paid ? (
+                  <>
+                    Continue to Application
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </>
+                ) : (
+                  <>
+                    Pay GHS {registrationFee} & Register
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Info Note */}
+            <p className="mt-6 text-xs text-zinc-500 text-center">
+              Registration is one-time per email. After payment, you can access the application form anytime.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+    )
   }
 
   return (

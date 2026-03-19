@@ -1,6 +1,6 @@
 'use server'
 
-import { writeClient } from '@/app/lib/sanity'
+import { client, writeClient } from '@/app/lib/sanity'
 
 export interface ApplicationFormData {
   // Section A: Personal Information
@@ -66,6 +66,38 @@ export async function submitApplication(
   }
 ): Promise<SubmitApplicationResult> {
   try {
+    const normalizedEmail = formData.email.toLowerCase()
+
+    // Server-side payment verification - check if email has paid registration
+    const registration = await client.fetch(
+      `*[_type == "applicationRegistration" && email == $email && paymentStatus == "paid"][0]{
+        _id,
+        email,
+        paymentStatus
+      }`,
+      { email: normalizedEmail }
+    )
+
+    if (!registration) {
+      return {
+        success: false,
+        message: 'Registration payment not found. Please complete registration payment before submitting your application.',
+      }
+    }
+
+    // Check for existing application with this email
+    const existingApplication = await client.fetch(
+      `*[_type == "application" && email == $email][0]{ _id }`,
+      { email: normalizedEmail }
+    )
+
+    if (existingApplication) {
+      return {
+        success: false,
+        message: 'An application with this email address has already been submitted. Each email can only submit one application.',
+      }
+    }
+
     // Upload files if provided
     const uploadedFiles: Record<string, { _type: 'file'; asset: { _type: 'reference'; _ref: string } }> = {}
 
@@ -152,6 +184,19 @@ export async function submitApplication(
     }
 
     const result = await writeClient.create(applicationDoc)
+
+    // Link the application to the registration record
+    try {
+      await writeClient.patch(registration._id).set({
+        application: {
+          _type: 'reference',
+          _ref: result._id,
+        },
+      }).commit()
+    } catch (linkError) {
+      console.error('Failed to link application to registration:', linkError)
+      // Don't fail the submission if linking fails
+    }
 
     return {
       success: true,

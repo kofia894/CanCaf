@@ -26,6 +26,14 @@ export const siteSettingsType = defineType({
       description: 'Message to display when applications are closed',
       initialValue: 'Applications for the CGCP-ON Africa programme are currently closed. Please check back later for future application periods.',
     }),
+    defineField({
+      name: 'cgcponRegistrationFee',
+      title: 'CGCP-ON Registration Fee (GHS)',
+      type: 'number',
+      description: 'Registration fee amount in Ghana Cedis that applicants must pay before accessing the application form',
+      initialValue: 50,
+      validation: (rule) => rule.required().positive(),
+    }),
   ],
   preview: {
     prepare() {

@@ -30,6 +30,12 @@ export default async function CGCPOnAfricaPage() {
 
   // Default to false if settings don't exist yet
   const applicationsOpen = settings?.cgcponApplicationsOpen ?? false
+  const registrationFee = settings?.cgcponRegistrationFee ?? 50
 
-  return <CGCPOnAfricaClient applicationsOpen={applicationsOpen} />
+  return (
+    <CGCPOnAfricaClient
+      applicationsOpen={applicationsOpen}
+      registrationFee={registrationFee}
+    />
+  )
 }

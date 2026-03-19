@@ -102,12 +102,14 @@ export const fetchOptions = { next: { revalidate: 60 } };
 export interface SiteSettings {
   cgcponApplicationsOpen: boolean;
   cgcponClosedMessage: string;
+  cgcponRegistrationFee: number;
 }
 
 // Query for site settings (singleton document)
 export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   cgcponApplicationsOpen,
-  cgcponClosedMessage
+  cgcponClosedMessage,
+  cgcponRegistrationFee
 }`;
 
 // Fetch site settings with shorter revalidation for quick updates
