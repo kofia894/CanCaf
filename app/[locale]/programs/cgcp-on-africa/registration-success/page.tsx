@@ -72,6 +72,11 @@ function RegistrationSuccessContent() {
       if (data.paid) {
         setStatus('success')
         setIsPolling(false)
+        // Also trigger status check in background for audit/logging purposes
+        if (data.clientReference) {
+          fetch(`/api/registration/callback?ref=${encodeURIComponent(data.clientReference)}`)
+            .catch(() => {}) // Ignore errors, this is just for logging
+        }
       } else if (data.exists && data.clientReference) {
         setStatus('pending')
         // Start polling if we have a client reference and haven't exceeded attempts
