@@ -29,6 +29,19 @@ export default function DonateClient() {
     phone: '',
     message: '',
   })
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [phoneError, setPhoneError] = useState<string | null>(null)
+
+  // Email validation function
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    return emailRegex.test(email)
+  }
+
+  // Phone validation function (basic check for non-empty)
+  const validatePhone = (phone: string): boolean => {
+    return phone.trim().length >= 10
+  }
 
   const getFinalAmount = () => {
     if (customAmount) {
@@ -58,7 +71,25 @@ export default function DonateClient() {
   }
 
   const handleContinueToPayment = () => {
-    if (donorInfo.firstName && donorInfo.lastName && donorInfo.email) {
+    let hasErrors = false
+
+    // Validate email
+    if (!validateEmail(donorInfo.email)) {
+      setEmailError('Please enter a valid email address')
+      hasErrors = true
+    } else {
+      setEmailError(null)
+    }
+
+    // Validate phone
+    if (!validatePhone(donorInfo.phone)) {
+      setPhoneError('Please enter a valid phone number')
+      hasErrors = true
+    } else {
+      setPhoneError(null)
+    }
+
+    if (!hasErrors && donorInfo.firstName && donorInfo.lastName && donorInfo.email && donorInfo.phone) {
       setStep('payment')
     }
   }
@@ -226,20 +257,47 @@ export default function DonateClient() {
           <input
             type="email"
             value={donorInfo.email}
-            onChange={(e) => handleDonorInfoChange('email', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 outline-none focus:border-[#0F766E] transition-colors"
+            onChange={(e) => {
+              handleDonorInfoChange('email', e.target.value)
+              if (emailError && validateEmail(e.target.value)) {
+                setEmailError(null)
+              }
+            }}
+            className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${
+              emailError
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-zinc-200 focus:border-[#0F766E]'
+            }`}
             required
           />
+          {emailError && (
+            <p className="text-red-500 text-xs mt-1">{emailError}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm text-zinc-600 mb-1">{t('phone')}</label>
+          <label className="block text-sm text-zinc-600 mb-1">{t('phone')} *</label>
           <input
             type="tel"
             value={donorInfo.phone}
-            onChange={(e) => handleDonorInfoChange('phone', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 outline-none focus:border-[#0F766E] transition-colors"
+            onChange={(e) => {
+              // Only allow numbers
+              const numbersOnly = e.target.value.replace(/[^0-9]/g, '')
+              handleDonorInfoChange('phone', numbersOnly)
+              if (phoneError && validatePhone(numbersOnly)) {
+                setPhoneError(null)
+              }
+            }}
+            className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${
+              phoneError
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-zinc-200 focus:border-[#0F766E]'
+            }`}
+            required
           />
+          {phoneError && (
+            <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+          )}
         </div>
 
         <div>
@@ -258,9 +316,9 @@ export default function DonateClient() {
       {/* Continue Button */}
       <button
         onClick={handleContinueToPayment}
-        disabled={!donorInfo.firstName || !donorInfo.lastName || !donorInfo.email}
+        disabled={!donorInfo.firstName || !donorInfo.lastName || !donorInfo.email || !donorInfo.phone}
         className={`w-full py-4 rounded-full font-medium transition-all duration-200 ${
-          donorInfo.firstName && donorInfo.lastName && donorInfo.email
+          donorInfo.firstName && donorInfo.lastName && donorInfo.email && donorInfo.phone
             ? 'bg-[#F59E0B] text-white hover:bg-[#D97706] active:scale-[0.98]'
             : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
         }`}
