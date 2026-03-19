@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Link } from '@/i18n/routing'
@@ -10,6 +10,7 @@ interface RegistrationStatus {
   paid: boolean
   phone?: string
   paidAt?: string
+  clientReference?: string
 }
 
 function RegistrationSuccessContent() {
@@ -17,38 +18,111 @@ function RegistrationSuccessContent() {
   const email = searchParams.get('email')
   const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'error'>('loading')
   const [registrationData, setRegistrationData] = useState<RegistrationStatus | null>(null)
+  const [isPolling, setIsPolling] = useState(false)
+  const [pollAttempt, setPollAttempt] = useState(0)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const maxPollAttempts = 6 // Poll for ~30 seconds (6 attempts x 5 seconds)
 
-  useEffect(() => {
-    const checkPaymentStatus = async () => {
-      if (!email) {
-        setStatus('error')
-        return
-      }
+  // Function to check payment via Hubtel transaction status API
+  const checkTransactionStatus = useCallback(async (clientRef: string) => {
+    try {
+      const response = await fetch(`/api/registration/callback?ref=${encodeURIComponent(clientRef)}`)
+      const data = await response.json()
 
-      try {
-        const response = await fetch('/api/registration/check', {
+      if (data.success && data.status === 'Paid') {
+        // Payment confirmed via status check
+        setStatus('success')
+        setIsPolling(false)
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current)
+        }
+        // Refresh registration data to get paidAt
+        const regResponse = await fetch('/api/registration/check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         })
-
-        const data: RegistrationStatus = await response.json()
-        setRegistrationData(data)
-
-        if (data.paid) {
-          setStatus('success')
-        } else if (data.exists) {
-          setStatus('pending')
-        } else {
-          setStatus('error')
-        }
-      } catch {
-        setStatus('error')
+        const regData = await regResponse.json()
+        setRegistrationData(regData)
+        return true
       }
+      return false
+    } catch {
+      return false
+    }
+  }, [email])
+
+  // Function to check registration status from Sanity
+  const checkPaymentStatus = useCallback(async () => {
+    if (!email) {
+      setStatus('error')
+      return
     }
 
+    try {
+      const response = await fetch('/api/registration/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data: RegistrationStatus = await response.json()
+      setRegistrationData(data)
+
+      if (data.paid) {
+        setStatus('success')
+        setIsPolling(false)
+      } else if (data.exists && data.clientReference) {
+        setStatus('pending')
+        // Start polling if we have a client reference and haven't exceeded attempts
+        if (!isPolling && pollAttempt < maxPollAttempts) {
+          setIsPolling(true)
+        }
+      } else if (data.exists) {
+        setStatus('pending')
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
+  }, [email, isPolling, pollAttempt, maxPollAttempts])
+
+  // Initial check on mount
+  useEffect(() => {
     checkPaymentStatus()
-  }, [email])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Polling effect for pending payments
+  useEffect(() => {
+    if (isPolling && registrationData?.clientReference && status === 'pending') {
+      pollIntervalRef.current = setInterval(async () => {
+        setPollAttempt(prev => {
+          const newAttempt = prev + 1
+          if (newAttempt >= maxPollAttempts) {
+            setIsPolling(false)
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current)
+            }
+          }
+          return newAttempt
+        })
+
+        // First check transaction status via Hubtel API
+        const paid = await checkTransactionStatus(registrationData.clientReference!)
+        if (!paid) {
+          // If not paid via status check, also check Sanity in case callback arrived
+          await checkPaymentStatus()
+        }
+      }, 5000) // Check every 5 seconds
+
+      return () => {
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current)
+        }
+      }
+    }
+  }, [isPolling, registrationData?.clientReference, status, checkTransactionStatus, checkPaymentStatus, maxPollAttempts])
 
   if (status === 'loading') {
     return (
@@ -121,29 +195,41 @@ function RegistrationSuccessContent() {
             className="bg-white rounded-2xl shadow-xl p-8 border border-zinc-200 text-center"
           >
             <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              {isPolling ? (
+                <div className="w-10 h-10 border-3 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
             </div>
 
             <h1 className="text-2xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-3">
-              Payment Pending
+              {isPolling ? 'Verifying Payment...' : 'Payment Pending'}
             </h1>
 
             <p className="text-zinc-600 mb-6">
-              Your payment is still being processed. This usually takes a few moments. Please wait or try again.
+              {isPolling
+                ? `Checking payment status with your provider... (${pollAttempt}/${maxPollAttempts})`
+                : 'Your payment is still being processed. This usually takes a few moments.'}
             </p>
 
             <div className="space-y-3">
-              <button
-                onClick={() => window.location.reload()}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] w-full"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                </svg>
-                Check Again
-              </button>
+              {!isPolling && (
+                <button
+                  onClick={() => {
+                    setPollAttempt(0)
+                    setIsPolling(true)
+                    checkPaymentStatus()
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] w-full"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Check Again
+                </button>
+              )}
 
               <Link
                 href="/programs/cgcp-on-africa"

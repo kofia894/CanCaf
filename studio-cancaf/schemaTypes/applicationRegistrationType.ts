@@ -73,9 +73,17 @@ export const applicationRegistrationType = defineType({
     }),
     defineField({
       name: 'hubtelResponse',
-      title: 'Hubtel Response',
+      title: 'Hubtel Callback Data',
       type: 'text',
       readOnly: true,
+      description: 'Raw callback webhook data from Hubtel',
+    }),
+    defineField({
+      name: 'hubtelStatusCheckResponse',
+      title: 'Hubtel Status Check Data',
+      type: 'text',
+      readOnly: true,
+      description: 'Raw transaction status check response from Hubtel',
     }),
     defineField({
       name: 'application',

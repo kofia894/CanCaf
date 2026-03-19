@@ -95,10 +95,17 @@ export const donationType = defineType({
     }),
     defineField({
       name: 'hubtelResponse',
-      title: 'Hubtel Response Data',
+      title: 'Hubtel Callback Data',
       type: 'text',
       readOnly: true,
-      description: 'Raw callback data from Hubtel for reference',
+      description: 'Raw callback webhook data from Hubtel',
+    }),
+    defineField({
+      name: 'hubtelStatusCheckResponse',
+      title: 'Hubtel Status Check Data',
+      type: 'text',
+      readOnly: true,
+      description: 'Raw transaction status check response from Hubtel',
     }),
   ],
   preview: {

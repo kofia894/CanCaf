@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeClient } from '@/app/lib/sanity'
+import { client, writeClient } from '@/app/lib/sanity'
 
 interface HubtelCallback {
   ResponseCode: string
@@ -130,16 +130,52 @@ export async function GET(request: NextRequest) {
 
     const statusData = await statusResponse.json()
 
-    // ============ HUBTEL UAT: STATUS CHECK SAMPLE ============
+    // ============ HUBTEL: DONATION STATUS CHECK ============
     console.log('========================================')
-    console.log('HUBTEL TRANSACTION STATUS CHECK')
+    console.log('HUBTEL DONATION TRANSACTION STATUS CHECK')
     console.log('Timestamp:', new Date().toISOString())
     console.log('Client Reference:', clientReference)
     console.log('Raw Status Response:')
     console.log(JSON.stringify(statusData, null, 2))
     console.log('========================================')
 
+    // Store status check response in Sanity
+    const donationQuery = `*[_type == "donation" && clientReference == $ref][0]._id`
+    const donationId = await client.fetch(donationQuery, { ref: clientReference })
+
+    if (donationId) {
+      try {
+        await writeClient.patch(donationId).set({
+          hubtelStatusCheckResponse: JSON.stringify(statusData),
+        }).commit()
+        console.log(`Status check response stored for donation ${clientReference}`)
+      } catch (sanityError) {
+        console.error('Failed to store status check response in Sanity:', sanityError)
+      }
+    }
+
     if (statusData.responseCode === '0000') {
+      // If status check shows paid but donation isn't marked successful, update it
+      if (statusData.data?.status === 'Paid' && donationId) {
+        const donation = await client.fetch(
+          `*[_type == "donation" && _id == $id][0]{ status }`,
+          { id: donationId }
+        )
+
+        if (donation?.status !== 'successful') {
+          try {
+            await writeClient.patch(donationId).set({
+              status: 'successful',
+              transactionId: statusData.data.transactionId,
+              paidAt: new Date().toISOString(),
+            }).commit()
+            console.log(`Donation ${clientReference} marked as successful via status check`)
+          } catch (updateError) {
+            console.error('Failed to update donation status:', updateError)
+          }
+        }
+      }
+
       return NextResponse.json({
         success: true,
         status: statusData.data.status,

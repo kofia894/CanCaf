@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         paymentStatus,
-        paidAt
+        paidAt,
+        clientReference
       }`,
       { email: email.toLowerCase() }
     )
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       paid: registration.paymentStatus === 'paid',
       phone: registration.phone,
       paidAt: registration.paidAt,
+      clientReference: registration.clientReference,
     })
 
   } catch (error) {
