@@ -20,8 +20,49 @@ function RegistrationSuccessContent() {
   const [registrationData, setRegistrationData] = useState<RegistrationStatus | null>(null)
   const [isPolling, setIsPolling] = useState(false)
   const [pollAttempt, setPollAttempt] = useState(0)
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false)
+  const [statusCheckResult, setStatusCheckResult] = useState<string | null>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const maxPollAttempts = 6 // Poll for ~30 seconds (6 attempts x 5 seconds)
+
+  // Manual transaction status check for debugging
+  const triggerManualStatusCheck = async () => {
+    if (!registrationData?.clientReference) {
+      setStatusCheckResult('No client reference available')
+      return
+    }
+
+    setIsCheckingStatus(true)
+    setStatusCheckResult(null)
+
+    try {
+      const response = await fetch(`/api/registration/callback?ref=${encodeURIComponent(registrationData.clientReference)}`)
+      const data = await response.json()
+      console.log('========================================')
+      console.log('HUBTEL TRANSACTION STATUS CHECK RESULT')
+      console.log('Client Reference:', registrationData.clientReference)
+      console.log('Response:', data)
+      console.log('========================================')
+      setStatusCheckResult(JSON.stringify(data, null, 2))
+
+      // If payment is confirmed, update status
+      if (data.success && data.status === 'Paid') {
+        setStatus('success')
+        // Refresh registration data
+        const regResponse = await fetch('/api/registration/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
+        const regData = await regResponse.json()
+        setRegistrationData(regData)
+      }
+    } catch (error) {
+      setStatusCheckResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsCheckingStatus(false)
+    }
+  }
 
   // Function to check payment via Hubtel transaction status API
   const checkTransactionStatus = useCallback(async (clientRef: string) => {
@@ -185,6 +226,43 @@ function RegistrationSuccessContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
+
+            {/* Manual Status Check Button for debugging */}
+            <button
+              onClick={triggerManualStatusCheck}
+              disabled={isCheckingStatus || !registrationData?.clientReference}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 mt-4 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-[0.98] w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCheckingStatus ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Checking Hubtel...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Check Transaction Status (Hubtel API)
+                </>
+              )}
+            </button>
+
+            {/* Status Check Result */}
+            {statusCheckResult && (
+              <div className="mt-4 p-4 bg-zinc-100 rounded-xl text-left">
+                <p className="text-xs font-medium text-zinc-500 mb-2">Hubtel Status Check Response:</p>
+                <pre className="text-xs text-zinc-700 overflow-x-auto whitespace-pre-wrap break-all">
+                  {statusCheckResult}
+                </pre>
+              </div>
+            )}
+
+            {registrationData?.clientReference && (
+              <p className="text-xs text-zinc-400 mt-2">
+                Ref: {registrationData.clientReference}
+              </p>
+            )}
           </motion.div>
         </div>
       </div>
