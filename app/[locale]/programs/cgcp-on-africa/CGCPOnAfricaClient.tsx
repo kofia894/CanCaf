@@ -217,179 +217,249 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
   // Show registration step
   if (currentStep === 'registration') {
     return (
-      <div className="min-h-screen bg-zinc-50 pt-32 md:pt-40 pb-12 md:pb-20">
-        <div className="max-w-md mx-auto px-4 sm:px-6">
+      <div className="min-h-screen bg-zinc-100 pt-32 md:pt-40 pb-12 md:pb-20">
+        <div className="max-w-md lg:max-w-5xl mx-auto px-4 sm:px-6">
+          {/* Back button */}
+          <button
+            onClick={handleBackToLanding}
+            className="flex items-center gap-2 text-zinc-600 hover:text-zinc-900 mb-6 motion-fast"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back
+          </button>
+
+          {/* Main Card Container */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-white rounded-2xl shadow-xl p-8 border border-zinc-200"
+            className="bg-white rounded-3xl shadow-xl overflow-hidden border border-zinc-200"
           >
-            {/* Back button */}
-            <button
-              onClick={handleBackToLanding}
-              className="flex items-center gap-2 text-zinc-600 hover:text-zinc-900 mb-6 motion-fast"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-              </svg>
-              Back
-            </button>
-
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-[#0F766E]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-2">
-                Access Application Form
-              </h1>
-              <p className="text-zinc-600 text-sm">
-                Enter your email to check your registration status or register as a new applicant
-              </p>
-            </div>
-
-            {/* Registration Fee Info - Only show for new users */}
-            {!registrationStatus?.paid && (
-              <div className="bg-[#F59E0B]/10 rounded-xl p-4 mb-6 border border-[#F59E0B]/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#F59E0B] rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className="flex flex-col lg:flex-row">
+              {/* Left Column - Disclaimer Panel (hidden on mobile) */}
+              <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-amber-50 to-amber-100/80 p-8 lg:p-10 flex-col justify-center">
+                <div className="max-w-sm mx-auto">
+                  {/* Warning Icon */}
+                  <div className="w-16 h-16 bg-amber-200/60 rounded-2xl flex items-center justify-center mb-6">
+                    <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                     </svg>
                   </div>
-                  <div>
-                    <p className="font-semibold text-zinc-900">New Applicant? Registration Fee: GHS {registrationFee}</p>
-                    <p className="text-xs text-zinc-600">One-time payment for application access</p>
+
+                  <h3 className="text-xl font-bold text-amber-900 font-[family-name:var(--font-montserrat)] mb-4">
+                    Important Notice
+                  </h3>
+
+                  <p className="text-amber-800 leading-relaxed mb-6">
+                    Please note that payment and application do not guarantee automatic acceptance into the CGCP-ON Africa Program.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-amber-800">All applications undergo thorough review</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-amber-800">Only shortlisted applicants will be contacted</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-amber-800">We appreciate your interest and understanding</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Already Registered Info - Show for returning users */}
-            {registrationStatus?.paid && (
-              <div className="bg-green-50 rounded-xl p-4 mb-6 border border-green-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              {/* Right Column - Form */}
+              <div className="lg:w-[55%] p-6 sm:p-8 lg:p-10">
+                {/* Header */}
+                <div className="text-center lg:text-left mb-8">
+                  <div className="w-14 h-14 bg-[#0F766E]/10 rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-4">
+                    <svg className="w-7 h-7 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                   </div>
-                  <div>
-                    <p className="font-semibold text-zinc-900">Welcome back!</p>
-                    <p className="text-xs text-zinc-600">Your registration is confirmed. Click below to access the application form.</p>
+                  <h1 className="text-2xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-2">
+                    Access Application Form
+                  </h1>
+                  <p className="text-zinc-500 text-sm">
+                    Enter your email to check your registration status or register as a new applicant
+                  </p>
+                </div>
+
+                {/* Important Disclaimer - Mobile only */}
+                <div className="lg:hidden bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-amber-800 mb-1">Important Notice</h3>
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        Payment and application do not guarantee acceptance. All applications undergo thorough review and only shortlisted applicants will be contacted.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Registration Form */}
-            <form onSubmit={handleRegistrationSubmit} className="space-y-5">
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={registrationEmail}
-                  onChange={(e) => setRegistrationEmail(e.target.value)}
-                  placeholder="your.email@example.com"
-                  className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
-                  required
-                />
-                {isCheckingRegistration && (
-                  <p className="mt-1.5 text-xs text-zinc-500 flex items-center gap-1">
-                    <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Checking registration...
-                  </p>
-                )}
-                {registrationStatus?.paid && (
-                  <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Registration already paid! Continue to access the form.
-                  </p>
-                )}
-              </div>
-
-              {/* Phone Field */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-zinc-700 mb-1.5">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={registrationPhone}
-                  onChange={(e) => setRegistrationPhone(e.target.value)}
-                  placeholder="0241234567"
-                  className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
-                  required
-                  disabled={registrationStatus?.paid}
-                />
-                <p className="mt-1 text-xs text-zinc-500">
-                  {registrationStatus?.paid
-                    ? 'Phone number from your registration'
-                    : 'Mobile money number for payment'}
-                </p>
-              </div>
-
-              {/* Error Message */}
-              {registrationError && (
-                <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
-                  <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  {registrationError}
+                {/* Registration Fee Info - Only show for new users */}
+              {!registrationStatus?.paid && (
+                <div className="bg-[#F59E0B]/10 rounded-xl p-4 mb-6 border border-[#F59E0B]/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#F59E0B] rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-zinc-900">New Applicant? Registration Fee: GHS {registrationFee}</p>
+                      <p className="text-xs text-zinc-600">One-time payment for application access</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isInitiatingPayment || isCheckingRegistration}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isInitiatingPayment ? (
-                  <>
-                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
-                  </>
-                ) : registrationStatus?.paid ? (
-                  <>
-                    Continue to Application
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </>
-                ) : (
-                  <>
-                    Pay GHS {registrationFee} & Register
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </>
-                )}
-              </button>
-            </form>
+              {/* Already Registered Info - Show for returning users */}
+              {registrationStatus?.paid && (
+                <div className="bg-green-50 rounded-xl p-4 mb-6 border border-green-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-zinc-900">Welcome back!</p>
+                      <p className="text-xs text-zinc-600">Your registration is confirmed. Click below to access the application form.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            {/* Info Note */}
-            <p className="mt-6 text-xs text-zinc-500 text-center">
-              {registrationStatus?.paid
-                ? 'You can access the application form anytime using this email.'
-                : 'Already registered? Enter your email above to check your status and access the form.'}
-            </p>
+              {/* Registration Form */}
+              <form onSubmit={handleRegistrationSubmit} className="space-y-5">
+                {/* Email Field */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={registrationEmail}
+                    onChange={(e) => setRegistrationEmail(e.target.value)}
+                    placeholder="your.email@example.com"
+                    className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
+                    required
+                  />
+                  {isCheckingRegistration && (
+                    <p className="mt-1.5 text-xs text-zinc-500 flex items-center gap-1">
+                      <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Checking registration...
+                    </p>
+                  )}
+                  {registrationStatus?.paid && (
+                    <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Registration already paid! Continue to access the form.
+                    </p>
+                  )}
+                </div>
+
+                {/* Phone Field */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={registrationPhone}
+                    onChange={(e) => setRegistrationPhone(e.target.value)}
+                    placeholder="0241234567"
+                    className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
+                    required
+                    disabled={registrationStatus?.paid}
+                  />
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {registrationStatus?.paid
+                      ? 'Phone number from your registration'
+                      : 'Mobile money number for payment'}
+                  </p>
+                </div>
+
+                {/* Error Message */}
+                {registrationError && (
+                  <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    {registrationError}
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isInitiatingPayment || isCheckingRegistration}
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isInitiatingPayment ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : registrationStatus?.paid ? (
+                    <>
+                      Continue to Application
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </>
+                  ) : (
+                    <>
+                      Pay GHS {registrationFee} & Register
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </form>
+
+                {/* Info Note */}
+                <p className="mt-6 text-xs text-zinc-500 text-center lg:text-left">
+                  {registrationStatus?.paid
+                    ? 'You can access the application form anytime using this email.'
+                    : 'Already registered? Enter your email above to check your status and access the form.'}
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
