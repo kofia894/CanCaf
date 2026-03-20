@@ -313,7 +313,7 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
                     <div>
                       <h3 className="text-sm font-semibold text-amber-800 mb-1">Important Notice</h3>
                       <p className="text-xs text-amber-700 leading-relaxed">
-                        Payment and application do not guarantee acceptance. All applications undergo thorough review and only shortlisted applicants will be contacted.
+                        Please note that payment and application do not guarantee automatic acceptance into the CGCP-ON Africa Program. All applications will undergo a thorough review process, and only applicants who are successfully selected and shortlisted will be contacted. We appreciate your interest and understanding.
                       </p>
                     </div>
                   </div>
@@ -408,6 +408,14 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
                       ? 'Phone number from your registration'
                       : 'Mobile money number for payment'}
                   </p>
+                  {!registrationStatus?.paid && (
+                    <p className="mt-2 text-xs text-amber-600 flex items-start gap-1.5">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                      </svg>
+                      MoMo payment is only available for Ghanaian mobile numbers
+                    </p>
+                  )}
                 </div>
 
                 {/* Error Message */}
