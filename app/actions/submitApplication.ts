@@ -68,33 +68,21 @@ export async function submitApplication(
   try {
     const normalizedEmail = formData.email.toLowerCase()
 
-    // Server-side payment verification - check if email has paid registration
-    const registration = await client.fetch(
-      `*[_type == "applicationRegistration" && email == $email && paymentStatus == "paid"][0]{
+    // Check for existing application with this email
+    const existingApplication = await client.fetch(
+      `*[_type == "application" && email == $email][0]{
         _id,
-        email,
+        status,
         paymentStatus
       }`,
       { email: normalizedEmail }
     )
 
-    if (!registration) {
+    // If application already exists and is fully submitted with payment, reject
+    if (existingApplication && existingApplication.status === 'submitted_paid') {
       return {
         success: false,
-        message: 'Registration payment not found. Please complete registration payment before submitting your application.',
-      }
-    }
-
-    // Check for existing application with this email
-    const existingApplication = await client.fetch(
-      `*[_type == "application" && email == $email][0]{ _id }`,
-      { email: normalizedEmail }
-    )
-
-    if (existingApplication) {
-      return {
-        success: false,
-        message: 'An application with this email address has already been submitted. Each email can only submit one application.',
+        message: 'An application with this email address has already been submitted and paid. Each email can only submit one application.',
       }
     }
 
@@ -126,81 +114,136 @@ export async function submitApplication(
       }
     }
 
-    // Create the application document
-    const applicationDoc = {
-      _type: 'application',
+    let result
 
-      // Section A: Personal Information
-      fullName: formData.fullName,
-      gender: formData.gender,
-      dateOfBirth: formData.dateOfBirth,
-      nationality: formData.nationality,
-      countryOfResidence: formData.countryOfResidence,
-      currentInstitution: formData.currentInstitution,
-      department: formData.department,
-      currentPosition: formData.currentPosition,
-      yearsOncologyExperience: formData.yearsOncologyExperience,
-      professionalRegistrationNumber: formData.professionalRegistrationNumber,
-      email: formData.email,
-      phone: formData.phone,
+    if (existingApplication) {
+      // Update existing application (from draft or previous submission)
+      const updateData: Record<string, unknown> = {
+        // Section A: Personal Information
+        fullName: formData.fullName,
+        gender: formData.gender,
+        dateOfBirth: formData.dateOfBirth,
+        nationality: formData.nationality,
+        countryOfResidence: formData.countryOfResidence,
+        currentInstitution: formData.currentInstitution,
+        department: formData.department,
+        currentPosition: formData.currentPosition,
+        yearsOncologyExperience: formData.yearsOncologyExperience,
+        professionalRegistrationNumber: formData.professionalRegistrationNumber,
+        email: normalizedEmail,
+        phone: formData.phone,
 
-      // Section B: Professional Background
-      nursingQualification: formData.nursingQualification,
-      nursingQualificationOther: formData.nursingQualificationOther || undefined,
-      qualificationInstitution: formData.qualificationInstitution || undefined,
-      yearCompleted: formData.yearCompleted || undefined,
-      oncologyTraining: formData.oncologyTraining || undefined,
-      areasOfPractice: formData.areasOfPractice,
-      areaOfPracticeOther: formData.areaOfPracticeOther || undefined,
-      priorGeneticsTraining: formData.priorGeneticsTraining,
-      geneticsTrainingDetails: formData.geneticsTrainingDetails || undefined,
+        // Section B: Professional Background
+        nursingQualification: formData.nursingQualification,
+        areasOfPractice: formData.areasOfPractice,
+        priorGeneticsTraining: formData.priorGeneticsTraining,
 
-      // Section C: Motivation and Interest
-      interestReason: formData.interestReason,
-      benefitDescription: formData.benefitDescription,
-      counselingExperience: formData.counselingExperience,
+        // Section C: Motivation and Interest
+        interestReason: formData.interestReason,
+        benefitDescription: formData.benefitDescription,
+        counselingExperience: formData.counselingExperience,
 
-      // Section D: Institutional Support
-      institutionName: formData.institutionName,
-      supervisorName: formData.supervisorName,
-      supervisorPosition: formData.supervisorPosition,
-      supervisorContact: formData.supervisorContact,
+        // Section D: Institutional Support
+        institutionName: formData.institutionName,
+        supervisorName: formData.supervisorName,
+        supervisorPosition: formData.supervisorPosition,
+        supervisorContact: formData.supervisorContact,
 
-      // Section E: Availability
-      canParticipateVirtually: formData.canParticipateVirtually,
-      hasReliableInternet: formData.hasReliableInternet,
+        // Section E: Availability
+        canParticipateVirtually: formData.canParticipateVirtually,
+        hasReliableInternet: formData.hasReliableInternet,
 
-      // Section G: Declaration
-      declarationAgreed: formData.declarationAgreed,
-      applicantSignatureName: formData.applicantSignatureName,
-      signatureDate: formData.signatureDate,
+        // Section G: Declaration
+        declarationAgreed: formData.declarationAgreed,
+        applicantSignatureName: formData.applicantSignatureName,
+        signatureDate: formData.signatureDate,
 
-      // Metadata
-      submittedAt: new Date().toISOString(),
-      status: 'pending',
+        // Metadata - mark as submitted but unpaid
+        submittedAt: new Date().toISOString(),
+        status: 'submitted_unpaid',
+        paymentStatus: 'unpaid',
 
-      // Uploaded files
-      ...uploadedFiles,
-    }
+        // Uploaded files
+        ...uploadedFiles,
+      }
 
-    const result = await writeClient.create(applicationDoc)
+      // Add optional fields only if they have values
+      if (formData.nursingQualificationOther) updateData.nursingQualificationOther = formData.nursingQualificationOther
+      if (formData.qualificationInstitution) updateData.qualificationInstitution = formData.qualificationInstitution
+      if (formData.yearCompleted) updateData.yearCompleted = formData.yearCompleted
+      if (formData.oncologyTraining) updateData.oncologyTraining = formData.oncologyTraining
+      if (formData.areaOfPracticeOther) updateData.areaOfPracticeOther = formData.areaOfPracticeOther
+      if (formData.geneticsTrainingDetails) updateData.geneticsTrainingDetails = formData.geneticsTrainingDetails
 
-    // Link the application to the registration record
-    try {
-      await writeClient.patch(registration._id).set({
-        application: {
-          _type: 'reference',
-          _ref: result._id,
-        },
-      }).commit()
-    } catch (linkError) {
-      console.error('Failed to link application to registration:', linkError)
-      // Don't fail the submission if linking fails
+      result = await writeClient
+        .patch(existingApplication._id)
+        .set(updateData)
+        .commit()
+    } else {
+      // Create new application document
+      const applicationDoc = {
+        _type: 'application',
+
+        // Section A: Personal Information
+        fullName: formData.fullName,
+        gender: formData.gender,
+        dateOfBirth: formData.dateOfBirth,
+        nationality: formData.nationality,
+        countryOfResidence: formData.countryOfResidence,
+        currentInstitution: formData.currentInstitution,
+        department: formData.department,
+        currentPosition: formData.currentPosition,
+        yearsOncologyExperience: formData.yearsOncologyExperience,
+        professionalRegistrationNumber: formData.professionalRegistrationNumber,
+        email: normalizedEmail,
+        phone: formData.phone,
+
+        // Section B: Professional Background
+        nursingQualification: formData.nursingQualification,
+        nursingQualificationOther: formData.nursingQualificationOther || undefined,
+        qualificationInstitution: formData.qualificationInstitution || undefined,
+        yearCompleted: formData.yearCompleted || undefined,
+        oncologyTraining: formData.oncologyTraining || undefined,
+        areasOfPractice: formData.areasOfPractice,
+        areaOfPracticeOther: formData.areaOfPracticeOther || undefined,
+        priorGeneticsTraining: formData.priorGeneticsTraining,
+        geneticsTrainingDetails: formData.geneticsTrainingDetails || undefined,
+
+        // Section C: Motivation and Interest
+        interestReason: formData.interestReason,
+        benefitDescription: formData.benefitDescription,
+        counselingExperience: formData.counselingExperience,
+
+        // Section D: Institutional Support
+        institutionName: formData.institutionName,
+        supervisorName: formData.supervisorName,
+        supervisorPosition: formData.supervisorPosition,
+        supervisorContact: formData.supervisorContact,
+
+        // Section E: Availability
+        canParticipateVirtually: formData.canParticipateVirtually,
+        hasReliableInternet: formData.hasReliableInternet,
+
+        // Section G: Declaration
+        declarationAgreed: formData.declarationAgreed,
+        applicantSignatureName: formData.applicantSignatureName,
+        signatureDate: formData.signatureDate,
+
+        // Metadata - mark as submitted but unpaid (will pay after)
+        submittedAt: new Date().toISOString(),
+        status: 'submitted_unpaid',
+        paymentStatus: 'unpaid',
+
+        // Uploaded files
+        ...uploadedFiles,
+      }
+
+      result = await writeClient.create(applicationDoc)
     }
 
     return {
       success: true,
-      message: 'Application submitted successfully',
+      message: 'Application submitted successfully. Please proceed to payment.',
       applicationId: result._id,
     }
   } catch (error) {

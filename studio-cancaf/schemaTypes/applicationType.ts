@@ -341,6 +341,9 @@ export const applicationType = defineType({
       type: 'string',
       options: {
         list: [
+          {title: 'Draft', value: 'draft'},
+          {title: 'Submitted (Unpaid)', value: 'submitted_unpaid'},
+          {title: 'Submitted (Paid)', value: 'submitted_paid'},
           {title: 'Pending Review', value: 'pending'},
           {title: 'Under Review', value: 'reviewing'},
           {title: 'Accepted', value: 'accepted'},
@@ -348,7 +351,73 @@ export const applicationType = defineType({
           {title: 'Waitlisted', value: 'waitlisted'},
         ],
       },
-      initialValue: 'pending',
+      initialValue: 'draft',
+    }),
+    defineField({
+      name: 'currentStep',
+      title: 'Current Form Step',
+      type: 'number',
+      description: 'Last step the applicant was on (for resuming)',
+      initialValue: 1,
+    }),
+    defineField({
+      name: 'lastSavedAt',
+      title: 'Last Saved At',
+      type: 'datetime',
+      readOnly: true,
+    }),
+
+    // Payment tracking
+    defineField({
+      name: 'paymentStatus',
+      title: 'Payment Status',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Unpaid', value: 'unpaid'},
+          {title: 'Pending', value: 'pending'},
+          {title: 'Paid', value: 'paid'},
+          {title: 'Failed', value: 'failed'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'unpaid',
+    }),
+    defineField({
+      name: 'paymentClientReference',
+      title: 'Payment Client Reference',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'paymentCheckoutId',
+      title: 'Payment Checkout ID',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'paymentAmount',
+      title: 'Payment Amount (GHS)',
+      type: 'number',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'paymentTransactionId',
+      title: 'Payment Transaction ID',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'paymentMethod',
+      title: 'Payment Method',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'paidAt',
+      title: 'Payment Date',
+      type: 'datetime',
+      readOnly: true,
     }),
   ],
   preview: {
@@ -356,20 +425,30 @@ export const applicationType = defineType({
       title: 'fullName',
       subtitle: 'email',
       status: 'status',
+      paymentStatus: 'paymentStatus',
       date: 'submittedAt',
     },
-    prepare({title, subtitle, status, date}) {
+    prepare({title, subtitle, status, paymentStatus, date}) {
       const statusLabels: Record<string, string> = {
-        pending: '🟡 Pending',
+        draft: '📝 Draft',
+        submitted_unpaid: '⏳ Submitted (Unpaid)',
+        submitted_paid: '💳 Submitted (Paid)',
+        pending: '🟡 Pending Review',
         reviewing: '🔵 Reviewing',
         accepted: '🟢 Accepted',
         rejected: '🔴 Rejected',
         waitlisted: '🟠 Waitlisted',
       }
-      const formattedDate = date ? new Date(date).toLocaleDateString() : ''
+      const paymentLabels: Record<string, string> = {
+        unpaid: '💵 Unpaid',
+        pending: '⏳ Payment Pending',
+        paid: '✅ Paid',
+        failed: '❌ Payment Failed',
+      }
+      const formattedDate = date ? new Date(date).toLocaleDateString() : 'Not submitted'
       return {
         title: title || 'Unnamed Application',
-        subtitle: `${statusLabels[status] || status} | ${subtitle} | ${formattedDate}`,
+        subtitle: `${statusLabels[status] || status} | ${paymentLabels[paymentStatus] || 'Unpaid'} | ${subtitle} | ${formattedDate}`,
       }
     },
   },

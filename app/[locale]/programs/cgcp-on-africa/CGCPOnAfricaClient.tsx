@@ -13,11 +13,25 @@ interface CGCPOnAfricaClientProps {
   registrationFee: number
 }
 
-interface RegistrationStatus {
-  exists: boolean
-  paid: boolean
+interface SavedApplication {
+  _id: string
+  status: string
+  paymentStatus: string
+  currentStep: number
+  fullName?: string
+  email?: string
   phone?: string
-  paidAt?: string
+  [key: string]: unknown
+}
+
+interface ApplicationCheckResult {
+  exists: boolean
+  application: SavedApplication | null
+}
+
+type ApplicationStatusMessage = {
+  type: 'already_paid' | 'submitted_unpaid' | 'draft' | null
+  message: string
 }
 
 /**
@@ -25,166 +39,120 @@ interface RegistrationStatus {
  *
  * Cancer Genetic Counselling Certificate Programme for Oncology Nurses in Africa
  * A collaboration between WAGMC, Aster Guardians Global Nursing Award, and CanCAF
+ *
+ * NEW FLOW: Users can access application form directly without paying first.
+ * Payment is prompted after form submission.
  */
 
-export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }: CGCPOnAfricaClientProps) {
+export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaClientProps) {
   const t = useTranslations('cgcpOnAfrica')
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Application flow states
-  const [currentStep, setCurrentStep] = useState<'landing' | 'registration' | 'form'>('landing')
-  const [registrationEmail, setRegistrationEmail] = useState('')
-  const [registrationPhone, setRegistrationPhone] = useState('')
-  const [isCheckingRegistration, setIsCheckingRegistration] = useState(false)
-  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
-  const [registrationError, setRegistrationError] = useState('')
-  const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus | null>(null)
+  // Application flow states - simplified to landing -> email entry -> form
+  const [currentStep, setCurrentStep] = useState<'landing' | 'email-entry' | 'form'>('landing')
+  const [userEmail, setUserEmail] = useState('')
+  const [isCheckingApplication, setIsCheckingApplication] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [savedApplication, setSavedApplication] = useState<SavedApplication | null>(null)
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatusMessage>({ type: null, message: '' })
 
-  // Check URL params on mount - if coming from payment success, go directly to form
+  // Check URL params on mount - if coming from payment success or with email param
   useEffect(() => {
     const applyParam = searchParams.get('apply')
     const emailParam = searchParams.get('email')
 
     if (applyParam === 'true' && emailParam && applicationsOpen) {
-      // Verify the email is actually paid before showing form
-      const verifyAndShowForm = async () => {
-        try {
-          const response = await fetch('/api/registration/check', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: emailParam.toLowerCase() }),
-          })
-          const data = await response.json()
-
-          if (data.paid) {
-            setRegistrationEmail(emailParam)
-            setRegistrationStatus(data)
-            setCurrentStep('form')
-          } else {
-            // Not paid, show registration step
-            setRegistrationEmail(emailParam)
-            setCurrentStep('registration')
-          }
-        } catch {
-          // On error, show registration step
-          setRegistrationEmail(emailParam)
-          setCurrentStep('registration')
-        }
-      }
-      verifyAndShowForm()
+      // Go directly to form with the email
+      setUserEmail(emailParam)
+      checkAndLoadApplication(emailParam)
     }
   }, [searchParams, applicationsOpen])
 
   const handleApplyClick = () => {
     if (applicationsOpen) {
-      setCurrentStep('registration')
+      setCurrentStep('email-entry')
     } else {
       router.push('/programs/cgcp-on-africa/applications-closed')
     }
   }
 
-  // Check registration status when email changes (with debounce)
-  const checkRegistrationStatus = async (email: string) => {
-    if (!email || !email.includes('@')) return
-
-    setIsCheckingRegistration(true)
-    setRegistrationError('')
+  // Check if application exists for email and load saved data
+  const checkAndLoadApplication = async (email: string) => {
+    setIsCheckingApplication(true)
+    setEmailError('')
+    setApplicationStatus({ type: null, message: '' })
 
     try {
-      const response = await fetch('/api/registration/check', {
+      const response = await fetch('/api/application/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.toLowerCase() }),
       })
 
-      const data = await response.json()
-      setRegistrationStatus(data)
+      const data: ApplicationCheckResult = await response.json()
 
-      // If already paid, pre-fill phone if available
-      if (data.paid && data.phone) {
-        setRegistrationPhone(data.phone)
+      if (data.exists && data.application) {
+        const app = data.application
+
+        // Check if application is already paid
+        if (app.paymentStatus === 'paid') {
+          setApplicationStatus({
+            type: 'already_paid',
+            message: 'This email already has a paid application. Your application is being reviewed.',
+          })
+          setSavedApplication(app)
+          return // Don't proceed to form
+        }
+
+        // Check if application is submitted but unpaid
+        if (app.status === 'submitted_unpaid') {
+          setApplicationStatus({
+            type: 'submitted_unpaid',
+            message: 'You have a submitted application pending payment. Would you like to complete payment?',
+          })
+          setSavedApplication(app)
+          return // Show payment option instead
+        }
+
+        // Draft application - allow to continue
+        setSavedApplication(app)
+        setApplicationStatus({
+          type: 'draft',
+          message: `Welcome back! You have a saved application (Step ${app.currentStep}/6). Continue where you left off.`,
+        })
+      } else {
+        setSavedApplication(null)
       }
+
+      // Go to form for new applications or drafts
+      setCurrentStep('form')
     } catch {
-      setRegistrationError('Failed to check registration status')
+      setEmailError('Failed to check application status. Please try again.')
     } finally {
-      setIsCheckingRegistration(false)
+      setIsCheckingApplication(false)
     }
   }
 
-  // Debounce email check
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (registrationEmail) {
-        checkRegistrationStatus(registrationEmail)
-      }
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [registrationEmail])
-
-  const handleRegistrationSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setRegistrationError('')
+    setEmailError('')
 
     // Basic validation
-    if (!registrationEmail || !registrationEmail.includes('@')) {
-      setRegistrationError('Please enter a valid email address')
+    if (!userEmail || !userEmail.includes('@')) {
+      setEmailError('Please enter a valid email address')
       return
     }
 
-    if (!registrationPhone || registrationPhone.length < 10) {
-      setRegistrationError('Please enter a valid phone number')
-      return
-    }
-
-    // If already paid, go directly to form
-    if (registrationStatus?.paid) {
-      setCurrentStep('form')
-      return
-    }
-
-    // Initiate payment
-    setIsInitiatingPayment(true)
-
-    try {
-      const response = await fetch('/api/registration/initiate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: registrationEmail.toLowerCase(),
-          phone: registrationPhone,
-        }),
-      })
-
-      const data = await response.json()
-
-      // Handle case where user already paid (race condition or manual URL access)
-      if (data.alreadyPaid) {
-        setRegistrationStatus({ exists: true, paid: true })
-        setCurrentStep('form')
-        return
-      }
-
-      if (data.success && data.checkoutUrl) {
-        // Redirect to Hubtel payment page
-        window.location.href = data.checkoutUrl
-      } else {
-        setRegistrationError(data.error || 'Failed to initiate payment')
-      }
-    } catch {
-      setRegistrationError('Failed to initiate payment. Please try again.')
-    } finally {
-      setIsInitiatingPayment(false)
-    }
+    await checkAndLoadApplication(userEmail)
   }
 
   const handleBackToLanding = () => {
     setCurrentStep('landing')
-    setRegistrationEmail('')
-    setRegistrationPhone('')
-    setRegistrationStatus(null)
-    setRegistrationError('')
+    setUserEmail('')
+    setSavedApplication(null)
+    setEmailError('')
+    setApplicationStatus({ type: null, message: '' })
   }
 
   const courseTopics = [
@@ -209,13 +177,19 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
     'englishProficiency',
   ]
 
-  // Show application form if registration is paid
+  // Show application form - pass email and saved application data
   if (currentStep === 'form') {
-    return <ApplicationForm onBack={handleBackToLanding} />
+    return (
+      <ApplicationForm
+        onBack={handleBackToLanding}
+        userEmail={userEmail}
+        savedApplication={savedApplication}
+      />
+    )
   }
 
-  // Show registration step
-  if (currentStep === 'registration') {
+  // Show email entry step - simplified flow without payment
+  if (currentStep === 'email-entry') {
     return (
       <div className="min-h-screen bg-zinc-100 pt-32 md:pt-40 pb-12 md:pb-20">
         <div className="max-w-md lg:max-w-5xl mx-auto px-4 sm:px-6">
@@ -238,54 +212,60 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
             className="bg-white rounded-3xl shadow-xl overflow-hidden border border-zinc-200"
           >
             <div className="flex flex-col lg:flex-row">
-              {/* Left Column - Disclaimer Panel (hidden on mobile) */}
-              <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-amber-50 to-amber-100/80 p-8 lg:p-10 flex-col justify-center">
+              {/* Left Column - Info Panel (hidden on mobile) */}
+              <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-[#0F766E]/5 to-[#0F766E]/10 p-8 lg:p-10 flex-col justify-center">
                 <div className="max-w-sm mx-auto">
-                  {/* Warning Icon */}
-                  <div className="w-16 h-16 bg-amber-200/60 rounded-2xl flex items-center justify-center mb-6">
-                    <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  {/* Icon */}
+                  <div className="w-16 h-16 bg-[#0F766E]/20 rounded-2xl flex items-center justify-center mb-6">
+                    <svg className="w-8 h-8 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
                     </svg>
                   </div>
 
-                  <h3 className="text-xl font-bold text-amber-900 font-[family-name:var(--font-montserrat)] mb-4">
-                    Important Notice
+                  <h3 className="text-xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-4">
+                    Start Your Application
                   </h3>
 
-                  <p className="text-amber-800 leading-relaxed mb-6">
-                    Please note that payment and application do not guarantee automatic acceptance into the CGCP-ON Africa Program.
+                  <p className="text-zinc-600 leading-relaxed mb-6">
+                    Fill out your application at your own pace. Your progress is saved automatically as you complete each section.
                   </p>
 
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-5 h-5 rounded-full bg-[#0F766E]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-[#0F766E]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <p className="text-sm text-amber-800">All applications undergo thorough review</p>
+                      <p className="text-sm text-zinc-600">Auto-save on each step</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-5 h-5 rounded-full bg-[#0F766E]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-[#0F766E]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <p className="text-sm text-amber-800">Only shortlisted applicants will be contacted</p>
+                      <p className="text-sm text-zinc-600">Resume anytime with your email</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-amber-300/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-5 h-5 rounded-full bg-[#0F766E]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-[#0F766E]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <p className="text-sm text-amber-800">We appreciate your interest and understanding</p>
+                      <p className="text-sm text-zinc-600">Pay after completing your application</p>
                     </div>
+                  </div>
+
+                  {/* Fee Info */}
+                  <div className="mt-6 p-4 bg-[#F59E0B]/10 rounded-xl border border-[#F59E0B]/20">
+                    <p className="text-sm font-medium text-zinc-900">Application Fee: GHS 100 or $10</p>
+                    <p className="text-xs text-zinc-600 mt-1">Payment required after form submission</p>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column - Form */}
+              {/* Right Column - Email Form */}
               <div className="lg:w-[55%] p-6 sm:p-8 lg:p-10">
                 {/* Header */}
                 <div className="text-center lg:text-left mb-8">
@@ -295,10 +275,10 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
                     </svg>
                   </div>
                   <h1 className="text-2xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] mb-2">
-                    Access Application Form
+                    Enter Your Email
                   </h1>
                   <p className="text-zinc-500 text-sm">
-                    Enter your email to check your registration status or register as a new applicant
+                    Start a new application or continue where you left off
                   </p>
                 </div>
 
@@ -313,15 +293,14 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
                     <div>
                       <h3 className="text-sm font-semibold text-amber-800 mb-1">Important Notice</h3>
                       <p className="text-xs text-amber-700 leading-relaxed">
-                        Please note that payment and application do not guarantee automatic acceptance into the CGCP-ON Africa Program. All applications will undergo a thorough review process, and only applicants who are successfully selected and shortlisted will be contacted. We appreciate your interest and understanding.
+                        Application does not guarantee automatic acceptance. All applications undergo thorough review and only shortlisted applicants will be contacted.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Registration Fee Info - Only show for new users */}
-              {!registrationStatus?.paid && (
-                <div className="bg-[#F59E0B]/10 rounded-xl p-4 mb-6 border border-[#F59E0B]/20">
+                {/* Fee Info - Mobile only */}
+                <div className="lg:hidden bg-[#F59E0B]/10 rounded-xl p-4 mb-6 border border-[#F59E0B]/20">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-[#F59E0B] rounded-full flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -329,143 +308,165 @@ export default function CGCPOnAfricaClient({ applicationsOpen, registrationFee }
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-zinc-900">New Applicant? Registration Fee: GHS {registrationFee}</p>
-                      <p className="text-xs text-zinc-600">One-time payment for application access</p>
+                      <p className="font-semibold text-zinc-900">Application Fee: GHS 100 or $10</p>
+                      <p className="text-xs text-zinc-600">Payment required after form submission</p>
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Already Registered Info - Show for returning users */}
-              {registrationStatus?.paid && (
-                <div className="bg-green-50 rounded-xl p-4 mb-6 border border-green-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                {/* Application Status Messages */}
+                {applicationStatus.type === 'already_paid' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-green-800 mb-1">Application Submitted & Paid</h3>
+                        <p className="text-sm text-green-700">{applicationStatus.message}</p>
+                        {savedApplication?.fullName && (
+                          <p className="text-sm text-green-600 mt-2">
+                            <strong>Applicant:</strong> {savedApplication.fullName}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-zinc-900">Welcome back!</p>
-                      <p className="text-xs text-zinc-600">Your registration is confirmed. Click below to access the application form.</p>
+                    <div className="mt-4 pt-4 border-t border-green-200">
+                      <p className="text-xs text-green-600">
+                        You will be contacted via email if your application is shortlisted.
+                      </p>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Registration Form */}
-              <form onSubmit={handleRegistrationSubmit} className="space-y-5">
-                {/* Email Field */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={registrationEmail}
-                    onChange={(e) => setRegistrationEmail(e.target.value)}
-                    placeholder="your.email@example.com"
-                    className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
-                    required
-                  />
-                  {isCheckingRegistration && (
-                    <p className="mt-1.5 text-xs text-zinc-500 flex items-center gap-1">
-                      <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Checking registration...
-                    </p>
-                  )}
-                  {registrationStatus?.paid && (
-                    <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Registration already paid! Continue to access the form.
-                    </p>
-                  )}
-                </div>
-
-                {/* Phone Field */}
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-zinc-700 mb-1.5">
-                    Phone Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    value={registrationPhone}
-                    onChange={(e) => setRegistrationPhone(e.target.value)}
-                    placeholder="0241234567"
-                    className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
-                    required
-                    disabled={registrationStatus?.paid}
-                  />
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {registrationStatus?.paid
-                      ? 'Phone number from your registration'
-                      : 'Mobile money number for payment'}
-                  </p>
-                  {!registrationStatus?.paid && (
-                    <p className="mt-2 text-xs text-amber-600 flex items-start gap-1.5">
-                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                      </svg>
-                      MoMo payment is only available for Ghanaian mobile numbers
-                    </p>
-                  )}
-                </div>
-
-                {/* Error Message */}
-                {registrationError && (
-                  <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
-                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    {registrationError}
-                  </div>
+                  </motion.div>
                 )}
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isInitiatingPayment || isCheckingRegistration}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {isInitiatingPayment ? (
-                    <>
-                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </>
-                  ) : registrationStatus?.paid ? (
-                    <>
-                      Continue to Application
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </>
-                  ) : (
-                    <>
-                      Pay GHS {registrationFee} & Register
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </>
-                  )}
-                </button>
-              </form>
+                {applicationStatus.type === 'submitted_unpaid' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-amber-800 mb-1">Payment Pending</h3>
+                        <p className="text-sm text-amber-700">{applicationStatus.message}</p>
+                        {savedApplication?.fullName && (
+                          <p className="text-sm text-amber-600 mt-2">
+                            <strong>Applicant:</strong> {savedApplication.fullName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-3">
+                      <button
+                        onClick={() => setCurrentStep('form')}
+                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#F59E0B] text-white rounded-xl text-sm font-medium motion-fast hover:bg-[#D4A017] active:scale-[0.98]"
+                      >
+                        Complete Payment (GHS 100 or $10)
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </button>
+                      <p className="text-xs text-amber-600 text-center">
+                        Your application is saved. Complete payment to finalize submission.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
 
-                {/* Info Note */}
-                <p className="mt-6 text-xs text-zinc-500 text-center lg:text-left">
-                  {registrationStatus?.paid
-                    ? 'You can access the application form anytime using this email.'
-                    : 'Already registered? Enter your email above to check your status and access the form.'}
-                </p>
+                {/* Email Entry Form - Only show when no blocking status */}
+                {applicationStatus.type !== 'already_paid' && applicationStatus.type !== 'submitted_unpaid' && (
+                  <>
+                    <form onSubmit={handleEmailSubmit} className="space-y-5">
+                      {/* Email Field */}
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                          Email Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          value={userEmail}
+                          onChange={(e) => setUserEmail(e.target.value)}
+                          placeholder="your.email@example.com"
+                          className="w-full px-4 py-3 border border-zinc-300 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:border-transparent outline-none motion-fast"
+                          required
+                        />
+                        <p className="mt-1.5 text-xs text-zinc-500">
+                          Your email will be used to save and retrieve your application
+                        </p>
+                      </div>
+
+                      {/* Error Message */}
+                      {emailError && (
+                        <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+                          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          {emailError}
+                        </div>
+                      )}
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={isCheckingApplication}
+                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#0F766E] text-white rounded-xl text-base font-medium motion-fast hover:bg-[#0D6B64] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isCheckingApplication ? (
+                          <>
+                            <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            Continue to Application
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                          </>
+                        )}
+                      </button>
+                    </form>
+
+                    {/* Info Note */}
+                    <p className="mt-6 text-xs text-zinc-500 text-center lg:text-left">
+                      Already started? Enter the same email to resume your application.
+                    </p>
+                  </>
+                )}
+
+                {/* Try Different Email - Show when status is blocking */}
+                {(applicationStatus.type === 'already_paid' || applicationStatus.type === 'submitted_unpaid') && (
+                  <div className="mt-6 pt-4 border-t border-zinc-200">
+                    <button
+                      onClick={() => {
+                        setApplicationStatus({ type: null, message: '' })
+                        setUserEmail('')
+                        setSavedApplication(null)
+                      }}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-zinc-100 text-zinc-700 rounded-xl text-sm font-medium motion-fast hover:bg-zinc-200 active:scale-[0.98]"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                      </svg>
+                      Use a Different Email
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

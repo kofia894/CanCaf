@@ -61,9 +61,23 @@ export const applicationRegistrationType = defineType({
     }),
     defineField({
       name: 'paymentMethod',
-      title: 'Payment Method',
+      title: 'Payment Method (from Hubtel)',
       type: 'string',
       readOnly: true,
+      description: 'The actual payment method used, returned by Hubtel after payment',
+    }),
+    defineField({
+      name: 'selectedPaymentMethod',
+      title: 'Selected Payment Method',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Mobile Money', value: 'Mobile Money'},
+          {title: 'Bank Card', value: 'Bank Card'},
+        ],
+      },
+      readOnly: true,
+      description: 'The payment method selected by the user before payment',
     }),
     defineField({
       name: 'paidAt',

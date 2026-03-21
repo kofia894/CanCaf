@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -12,10 +12,25 @@ import { submitApplication } from '@/app/actions/submitApplication'
  * Comprehensive application form for CGCP-ON Africa Programme
  * Based on official application form structure
  * Steps: Personal Info → Professional Background → Motivation → Institutional Support → Availability & Documents → Declaration
+ *
+ * NEW FEATURES:
+ * - Auto-save on step transitions
+ * - Load saved application data on mount
+ * - Payment prompt after form submission
  */
+
+interface SavedApplication {
+  _id: string
+  status: string
+  paymentStatus: string
+  currentStep: number
+  [key: string]: unknown
+}
 
 interface ApplicationFormProps {
   onBack: () => void
+  userEmail: string
+  savedApplication: SavedApplication | null
 }
 
 interface FormData {
@@ -84,11 +99,16 @@ const AREAS_OF_PRACTICE = [
   'other',
 ]
 
-export default function ApplicationForm({ onBack }: ApplicationFormProps) {
+export default function ApplicationForm({ onBack, userEmail, savedApplication }: ApplicationFormProps) {
   const t = useTranslations('applicationForm')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [applicationId, setApplicationId] = useState<string | null>(savedApplication?._id || null)
+  const [showPaymentPrompt, setShowPaymentPrompt] = useState(false)
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'momo' | 'card' | null>(null)
 
   // File input refs
   const supportLetterRef = useRef<HTMLInputElement>(null)
@@ -97,59 +117,208 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
   const licenseRef = useRef<HTMLInputElement>(null)
   const institutionalLetterRef = useRef<HTMLInputElement>(null)
 
-  const [formData, setFormData] = useState<FormData>({
-    // Section A
-    fullName: '',
-    gender: '',
-    dateOfBirth: '',
-    nationality: '',
-    countryOfResidence: '',
-    currentInstitution: '',
-    department: '',
-    currentPosition: '',
-    yearsOncologyExperience: '',
-    professionalRegistrationNumber: '',
-    email: '',
-    phone: '',
+  // Initialize form data with saved application or defaults
+  const getInitialFormData = useCallback((): FormData => {
+    if (savedApplication) {
+      return {
+        // Section A
+        fullName: (savedApplication.fullName as string) || '',
+        gender: (savedApplication.gender as string) || '',
+        dateOfBirth: (savedApplication.dateOfBirth as string) || '',
+        nationality: (savedApplication.nationality as string) || '',
+        countryOfResidence: (savedApplication.countryOfResidence as string) || '',
+        currentInstitution: (savedApplication.currentInstitution as string) || '',
+        department: (savedApplication.department as string) || '',
+        currentPosition: (savedApplication.currentPosition as string) || '',
+        yearsOncologyExperience: (savedApplication.yearsOncologyExperience as string) || '',
+        professionalRegistrationNumber: (savedApplication.professionalRegistrationNumber as string) || '',
+        email: userEmail,
+        phone: (savedApplication.phone as string) || '',
 
-    // Section B
-    nursingQualification: '',
-    nursingQualificationOther: '',
-    qualificationInstitution: '',
-    yearCompleted: '',
-    oncologyTraining: '',
-    areasOfPractice: [],
-    areaOfPracticeOther: '',
-    priorGeneticsTraining: null,
-    geneticsTrainingDetails: '',
+        // Section B
+        nursingQualification: (savedApplication.nursingQualification as string) || '',
+        nursingQualificationOther: (savedApplication.nursingQualificationOther as string) || '',
+        qualificationInstitution: (savedApplication.qualificationInstitution as string) || '',
+        yearCompleted: (savedApplication.yearCompleted as string) || '',
+        oncologyTraining: (savedApplication.oncologyTraining as string) || '',
+        areasOfPractice: (savedApplication.areasOfPractice as string[]) || [],
+        areaOfPracticeOther: (savedApplication.areaOfPracticeOther as string) || '',
+        priorGeneticsTraining: savedApplication.priorGeneticsTraining as boolean | null ?? null,
+        geneticsTrainingDetails: (savedApplication.geneticsTrainingDetails as string) || '',
 
-    // Section C
-    interestReason: '',
-    benefitDescription: '',
-    counselingExperience: '',
+        // Section C
+        interestReason: (savedApplication.interestReason as string) || '',
+        benefitDescription: (savedApplication.benefitDescription as string) || '',
+        counselingExperience: (savedApplication.counselingExperience as string) || '',
 
-    // Section D
-    institutionName: '',
-    supervisorName: '',
-    supervisorPosition: '',
-    supervisorContact: '',
-    supportLetterFile: null,
+        // Section D
+        institutionName: (savedApplication.institutionName as string) || '',
+        supervisorName: (savedApplication.supervisorName as string) || '',
+        supervisorPosition: (savedApplication.supervisorPosition as string) || '',
+        supervisorContact: (savedApplication.supervisorContact as string) || '',
+        supportLetterFile: null,
 
-    // Section E
-    canParticipateVirtually: null,
-    hasReliableInternet: null,
+        // Section E
+        canParticipateVirtually: savedApplication.canParticipateVirtually as boolean | null ?? null,
+        hasReliableInternet: savedApplication.hasReliableInternet as boolean | null ?? null,
 
-    // Section F
-    cvFile: null,
-    statementOfInterestFile: null,
-    professionalLicenseFile: null,
-    institutionalSupportLetterFile: null,
+        // Section F
+        cvFile: null,
+        statementOfInterestFile: null,
+        professionalLicenseFile: null,
+        institutionalSupportLetterFile: null,
 
-    // Section G
-    declarationAgreed: false,
-    applicantSignatureName: '',
-    signatureDate: '',
-  })
+        // Section G
+        declarationAgreed: (savedApplication.declarationAgreed as boolean) || false,
+        applicantSignatureName: (savedApplication.applicantSignatureName as string) || '',
+        signatureDate: (savedApplication.signatureDate as string) || '',
+      }
+    }
+
+    return {
+      // Section A
+      fullName: '',
+      gender: '',
+      dateOfBirth: '',
+      nationality: '',
+      countryOfResidence: '',
+      currentInstitution: '',
+      department: '',
+      currentPosition: '',
+      yearsOncologyExperience: '',
+      professionalRegistrationNumber: '',
+      email: userEmail,
+      phone: '',
+
+      // Section B
+      nursingQualification: '',
+      nursingQualificationOther: '',
+      qualificationInstitution: '',
+      yearCompleted: '',
+      oncologyTraining: '',
+      areasOfPractice: [],
+      areaOfPracticeOther: '',
+      priorGeneticsTraining: null,
+      geneticsTrainingDetails: '',
+
+      // Section C
+      interestReason: '',
+      benefitDescription: '',
+      counselingExperience: '',
+
+      // Section D
+      institutionName: '',
+      supervisorName: '',
+      supervisorPosition: '',
+      supervisorContact: '',
+      supportLetterFile: null,
+
+      // Section E
+      canParticipateVirtually: null,
+      hasReliableInternet: null,
+
+      // Section F
+      cvFile: null,
+      statementOfInterestFile: null,
+      professionalLicenseFile: null,
+      institutionalSupportLetterFile: null,
+
+      // Section G
+      declarationAgreed: false,
+      applicantSignatureName: '',
+      signatureDate: '',
+    }
+  }, [savedApplication, userEmail])
+
+  const [formData, setFormData] = useState<FormData>(getInitialFormData)
+
+  // Set initial step from saved application
+  useEffect(() => {
+    if (savedApplication?.currentStep) {
+      setCurrentStep(savedApplication.currentStep)
+    }
+  }, [savedApplication])
+
+  // Auto-save function
+  const saveApplication = useCallback(async (step: number, isSubmitting = false) => {
+    setIsSaving(true)
+    try {
+      // Create a clean copy without File objects (they can't be JSON serialized)
+      const dataToSave = {
+        // Section A
+        fullName: formData.fullName,
+        gender: formData.gender,
+        dateOfBirth: formData.dateOfBirth,
+        nationality: formData.nationality,
+        countryOfResidence: formData.countryOfResidence,
+        currentInstitution: formData.currentInstitution,
+        department: formData.department,
+        currentPosition: formData.currentPosition,
+        yearsOncologyExperience: formData.yearsOncologyExperience,
+        professionalRegistrationNumber: formData.professionalRegistrationNumber,
+        email: formData.email,
+        phone: formData.phone,
+        // Section B
+        nursingQualification: formData.nursingQualification,
+        nursingQualificationOther: formData.nursingQualificationOther,
+        qualificationInstitution: formData.qualificationInstitution,
+        yearCompleted: formData.yearCompleted,
+        oncologyTraining: formData.oncologyTraining,
+        areasOfPractice: formData.areasOfPractice,
+        areaOfPracticeOther: formData.areaOfPracticeOther,
+        priorGeneticsTraining: formData.priorGeneticsTraining,
+        geneticsTrainingDetails: formData.geneticsTrainingDetails,
+        // Section C
+        interestReason: formData.interestReason,
+        benefitDescription: formData.benefitDescription,
+        counselingExperience: formData.counselingExperience,
+        // Section D
+        institutionName: formData.institutionName,
+        supervisorName: formData.supervisorName,
+        supervisorPosition: formData.supervisorPosition,
+        supervisorContact: formData.supervisorContact,
+        // Section E
+        canParticipateVirtually: formData.canParticipateVirtually,
+        hasReliableInternet: formData.hasReliableInternet,
+        // Section G
+        declarationAgreed: formData.declarationAgreed,
+        applicantSignatureName: formData.applicantSignatureName,
+        signatureDate: formData.signatureDate,
+        // Meta
+        currentStep: step,
+      }
+
+      const response = await fetch('/api/application/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationData: dataToSave,
+          isSubmitting,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        if (result.applicationId) {
+          setApplicationId(result.applicationId)
+        }
+        if (!isSubmitting) {
+          toast.success('Progress saved', { duration: 2000 })
+        }
+        return true
+      } else {
+        toast.error('Failed to save progress')
+        return false
+      }
+    } catch (error) {
+      console.error('Save error:', error)
+      toast.error('Failed to save progress')
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }, [formData])
 
   const updateFormData = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -168,17 +337,73 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
     setFormData((prev) => ({ ...prev, [field]: file }))
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < TOTAL_STEPS) {
-      setCurrentStep((prev) => prev + 1)
+      const newStep = currentStep + 1
+      // Auto-save when moving to next step
+      await saveApplication(newStep)
+      setCurrentStep(newStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
-  const prevStep = () => {
+  const prevStep = async () => {
     if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1)
+      const newStep = currentStep - 1
+      // Auto-save when going back
+      await saveApplication(newStep)
+      setCurrentStep(newStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  // Initiate payment for the application
+  const initiatePayment = async () => {
+    if (!applicationId) {
+      toast.error('Application not found')
+      return
+    }
+
+    if (!selectedPaymentMethod) {
+      toast.error('Please select a payment method')
+      return
+    }
+
+    setIsInitiatingPayment(true)
+
+    try {
+      const response = await fetch('/api/application/payment/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId,
+          email: formData.email,
+          phone: formData.phone,
+          fullName: formData.fullName,
+          paymentMethod: selectedPaymentMethod,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.alreadyPaid) {
+        toast.success('Application already paid!')
+        setIsSubmitted(true)
+        setShowPaymentPrompt(false)
+        return
+      }
+
+      if (data.success && data.checkoutUrl) {
+        // Redirect to payment page
+        window.location.href = data.checkoutUrl
+      } else {
+        toast.error(data.error || 'Failed to initiate payment')
+      }
+    } catch (error) {
+      console.error('Payment error:', error)
+      toast.error('Failed to initiate payment')
+    } finally {
+      setIsInitiatingPayment(false)
     }
   }
 
@@ -186,6 +411,16 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
     setIsSubmitting(true)
 
     try {
+      // First, save the application with isSubmitting flag
+      const saved = await saveApplication(TOTAL_STEPS, true)
+
+      if (!saved) {
+        toast.error('Failed to save application')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Then upload files via the existing submitApplication action
       const result = await submitApplication(
         {
           // Section A
@@ -238,10 +473,11 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
       )
 
       if (result.success) {
-        toast.success('Application submitted successfully!', {
-          description: 'We will review your application and get back to you soon.',
+        toast.success('Application submitted!', {
+          description: 'Please complete payment to finalize your application.',
         })
-        setIsSubmitted(true)
+        // Show payment prompt instead of marking as fully submitted
+        setShowPaymentPrompt(true)
       } else {
         toast.error('Submission failed', {
           description: result.message || 'Failed to submit application. Please try again.',
@@ -369,6 +605,198 @@ export default function ApplicationForm({ onBack }: ApplicationFormProps) {
           onChange={handleFileChange}
           className="hidden"
         />
+      </div>
+    )
+  }
+
+  // Show payment prompt after form submission
+  if (showPaymentPrompt) {
+    return (
+      <div className="min-h-screen pt-20 md:pt-[calc(2.5rem+4rem+3rem)] bg-zinc-50">
+        <div className="max-w-2xl mx-auto px-4 py-16">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-2xl shadow-lg p-8 md:p-12"
+          >
+            {/* Success Icon */}
+            <div className="w-16 h-16 bg-[#0F766E]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 font-[family-name:var(--font-montserrat)] text-center mb-3">
+              Application Submitted!
+            </h2>
+
+            {/* Subtitle */}
+            <p className="text-zinc-600 text-center mb-8">
+              Your application has been saved successfully. Please complete the payment to finalize your registration.
+            </p>
+
+            {/* Payment Card */}
+            <div className="bg-gradient-to-br from-[#0F766E]/5 to-[#0F766E]/10 rounded-xl p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-zinc-600">Application Fee</span>
+                <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                  Required
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-3 mb-2">
+                <span className="text-4xl font-bold text-[#0F766E]">GHS 100</span>
+                <span className="text-zinc-400">or</span>
+                <span className="text-2xl font-semibold text-zinc-700">$10</span>
+              </div>
+
+              <p className="text-sm text-zinc-500">
+                Payment is required for your application to be considered for the CGCP-ON Africa Programme.
+              </p>
+            </div>
+
+            {/* Payment Method Selection */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-zinc-700 mb-3">
+                Select Payment Method <span className="text-red-500">*</span>
+              </label>
+              <div className="space-y-3">
+                {/* Mobile Money Option */}
+                <label
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    selectedPaymentMethod === 'momo'
+                      ? 'border-[#0F766E] bg-[#0F766E]/5'
+                      : 'border-zinc-200 hover:border-zinc-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="momo"
+                    checked={selectedPaymentMethod === 'momo'}
+                    onChange={() => setSelectedPaymentMethod('momo')}
+                    className="w-5 h-5 text-[#0F766E] border-zinc-300 focus:ring-[#0F766E] mt-0.5"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                      </svg>
+                      <span className="font-medium text-zinc-900">Mobile Money</span>
+                      <span className="px-2 py-0.5 bg-[#0F766E]/10 text-[#0F766E] text-xs font-medium rounded-full">
+                        GHS 100
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-500">MTN MoMo, Vodafone Cash, AirtelTigo Money</p>
+                    <div className="mt-2 flex items-start gap-2 p-2 bg-amber-50 rounded-lg border border-amber-100">
+                      <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                      </svg>
+                      <p className="text-xs text-amber-700">
+                        Mobile Money is only available for Ghanaian phone numbers (+233)
+                      </p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Card Option */}
+                <label
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    selectedPaymentMethod === 'card'
+                      ? 'border-[#0F766E] bg-[#0F766E]/5'
+                      : 'border-zinc-200 hover:border-zinc-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="card"
+                    checked={selectedPaymentMethod === 'card'}
+                    onChange={() => setSelectedPaymentMethod('card')}
+                    className="w-5 h-5 text-[#0F766E] border-zinc-300 focus:ring-[#0F766E] mt-0.5"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                      </svg>
+                      <span className="font-medium text-zinc-900">Bank Card</span>
+                      <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 text-xs font-medium rounded-full">
+                        $10 USD
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-500">Visa, Mastercard - Available worldwide</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Payment Info */}
+            <div className="space-y-3 mb-8">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#0F766E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm text-zinc-600">
+                  Secure payment powered by Hubtel
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#0F766E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm text-zinc-600">
+                  You will receive a confirmation email after payment
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#0F766E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm text-zinc-600">
+                  Your application will be reviewed once payment is confirmed
+                </p>
+              </div>
+            </div>
+
+            {/* Pay Now Button */}
+            <button
+              onClick={initiatePayment}
+              disabled={isInitiatingPayment || !selectedPaymentMethod}
+              className="w-full py-4 bg-[#0F766E] text-white rounded-xl text-base font-semibold transition-all hover:bg-[#0d6b63] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isInitiatingPayment ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                  {selectedPaymentMethod === 'momo' ? 'Pay GHS 100 with Mobile Money' : selectedPaymentMethod === 'card' ? 'Pay $10 with Card' : 'Select a payment method'}
+                </>
+              )}
+            </button>
+
+            {/* Note */}
+            <p className="text-xs text-zinc-400 text-center mt-6">
+              Payment is processed securely. Your financial information is never stored on our servers.
+            </p>
+          </motion.div>
+        </div>
       </div>
     )
   }
