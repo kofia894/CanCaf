@@ -69,14 +69,17 @@ export async function submitApplication(
     const normalizedEmail = formData.email.toLowerCase()
 
     // Check for existing application with this email
-    const existingApplication = await client.fetch(
-      `*[_type == "application" && email == $email][0]{
+    // Use ordering to consistently get the same document if duplicates exist
+    const existingApplications = await client.fetch(
+      `*[_type == "application" && email == $email] | order(_createdAt asc) {
         _id,
         status,
         paymentStatus
       }`,
       { email: normalizedEmail }
     )
+
+    const existingApplication = existingApplications?.[0] || null
 
     // If application already exists and is fully submitted with payment, reject
     if (existingApplication && existingApplication.status === 'submitted_paid') {
@@ -180,9 +183,12 @@ export async function submitApplication(
         .set(updateData)
         .commit()
     } else {
-      // Create new application document
+      // Create new application with deterministic ID based on email to prevent race condition duplicates
+      const deterministicId = `application-${Buffer.from(normalizedEmail).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 32)}`
+
       const applicationDoc = {
-        _type: 'application',
+        _id: deterministicId,
+        _type: 'application' as const,
 
         // Section A: Personal Information
         fullName: formData.fullName,
@@ -238,7 +244,8 @@ export async function submitApplication(
         ...uploadedFiles,
       }
 
-      result = await writeClient.create(applicationDoc)
+      // Use createIfNotExists to handle race conditions
+      result = await writeClient.createIfNotExists(applicationDoc)
     }
 
     return {

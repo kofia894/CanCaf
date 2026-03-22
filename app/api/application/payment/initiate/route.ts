@@ -137,11 +137,12 @@ export async function POST(request: NextRequest) {
 
     // Create applicationRegistration record with pending status
     try {
-      // Check if registration already exists for this application
-      const existingRegistration = await client.fetch(
-        `*[_type == "applicationRegistration" && application._ref == $appId][0]{ _id }`,
+      // Check if registration already exists for this application (get oldest if duplicates)
+      const existingRegistrations = await client.fetch(
+        `*[_type == "applicationRegistration" && application._ref == $appId] | order(_createdAt asc) { _id }`,
         { appId: applicationId }
       )
+      const existingRegistration = existingRegistrations?.[0] || null
 
       const paymentMethodLabel = paymentMethod === 'momo' ? 'Mobile Money' : 'Bank Card'
 
@@ -158,8 +159,11 @@ export async function POST(request: NextRequest) {
           })
           .commit()
       } else {
-        // Create new registration linked to application
-        await writeClient.create({
+        // Create new registration with deterministic ID based on applicationId to prevent duplicates
+        const deterministicRegId = `appreg-${applicationId}`
+
+        await writeClient.createIfNotExists({
+          _id: deterministicRegId,
           _type: 'applicationRegistration',
           email: email.toLowerCase(),
           phone,

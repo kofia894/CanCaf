@@ -76,10 +76,18 @@ export async function POST(request: NextRequest) {
     const email = applicationData.email.toLowerCase()
 
     // Check if application already exists for this email
-    const existingApplication = await client.fetch(
-      `*[_type == "application" && email == $email][0]{ _id, status, paymentStatus }`,
+    // Use ordering to consistently get the same document if duplicates exist
+    const existingApplications = await client.fetch(
+      `*[_type == "application" && email == $email] | order(_createdAt asc) { _id, status, paymentStatus }`,
       { email }
     )
+
+    const existingApplication = existingApplications?.[0] || null
+
+    // If there are duplicate applications, log a warning (shouldn't happen but handle gracefully)
+    if (existingApplications && existingApplications.length > 1) {
+      console.error(`Warning: Found ${existingApplications.length} applications for email ${email}. Using oldest one: ${existingApplication._id}`)
+    }
 
     // Prepare the update data (without _type for patches)
     const updateData: Record<string, unknown> = {
@@ -122,14 +130,20 @@ export async function POST(request: NextRequest) {
         .set(updateData)
         .commit()
     } else {
-      // Create new application (include _type for creation)
+      // Create new application with deterministic ID based on email to prevent race condition duplicates
+      // This ensures that even if two requests come in simultaneously, they'll try to create the same ID
+      const deterministicId = `application-${Buffer.from(email).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 32)}`
+
       const createData = {
+        _id: deterministicId,
         _type: 'application' as const,
         ...updateData,
         status: 'draft',
         paymentStatus: 'unpaid',
       }
-      result = await writeClient.create(createData)
+
+      // Use createIfNotExists to handle race conditions - if another request created it first, this will just return
+      result = await writeClient.createIfNotExists(createData)
     }
 
     return NextResponse.json({
