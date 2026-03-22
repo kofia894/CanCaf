@@ -24,13 +24,6 @@ export async function POST(request: NextRequest) {
   try {
     const body: HubtelCallback = await request.json()
 
-    // ============ HUBTEL UAT: REGISTRATION CALLBACK ============
-    console.log('========================================')
-    console.log('HUBTEL REGISTRATION CALLBACK RECEIVED')
-    console.log('Timestamp:', new Date().toISOString())
-    console.log('Raw Callback Data:')
-    console.log(JSON.stringify(body, null, 2))
-    console.log('========================================')
 
     const { ResponseCode, Status, Data } = body
 
