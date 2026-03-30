@@ -598,27 +598,12 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                   {t('partnersTag')}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-4">
-                  {/* CanCAF Logo */}
                   <div className="bg-white rounded-2xl p-5 w-40 h-32 flex flex-col items-center justify-center shadow-lg">
-                    <Image
-                      src="/CancafLogoRemBg.png"
-                      alt="CanCAF"
-                      width={120}
-                      height={60}
-                      className="w-auto h-14 object-contain mb-2"
-                    />
+                    <Image src="/CancafLogoRemBg.png" alt="CanCAF" width={120} height={60} className="w-auto h-14 object-contain mb-2" />
                     <span className="text-xs font-semibold text-zinc-700">CanCAF</span>
                   </div>
-
-                  {/* WAGMC Logo */}
                   <div className="bg-white rounded-2xl p-5 w-40 h-32 flex flex-col items-center justify-center shadow-lg">
-                    <Image
-                      src="/wagmcAlone.png"
-                      alt="WAGMC"
-                      width={120}
-                      height={60}
-                      className="w-auto h-14 object-contain mb-2"
-                    />
+                    <Image src="/wagmcAlone.png" alt="WAGMC" width={120} height={60} className="w-auto h-14 object-contain mb-2" />
                     <span className="text-xs font-semibold text-zinc-700 text-center">WAGMC</span>
                   </div>
                 </div>
