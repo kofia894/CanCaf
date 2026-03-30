@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
@@ -14,9 +15,72 @@ import Image from 'next/image'
 export default function Hero() {
   const t = useTranslations('hero')
   const tCgcp = useTranslations('cgcpOnAfrica')
+  const [flyerOpen, setFlyerOpen] = useState(false)
 
   return (
-    <section className="relative min-h-[95vh] w-full overflow-hidden">
+    <>
+      {/* Fullscreen flyer overlay (mobile) */}
+      <AnimatePresence>
+        {flyerOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-4"
+            onClick={() => setFlyerOpen(false)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setFlyerOpen(false)}
+              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Flyer image */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="w-full max-w-md max-h-[85vh] overflow-hidden rounded-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src="/launchflyer.webp"
+                alt="CGCP-ON Africa Programme Flyer"
+                width={600}
+                height={800}
+                className="w-full h-auto object-contain"
+              />
+            </motion.div>
+
+            {/* View programme link */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-4"
+            >
+              <Link
+                href="/programs/cgcp-on-africa"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0F766E] text-white rounded-full text-sm font-semibold shadow-lg"
+                onClick={() => setFlyerOpen(false)}
+              >
+                View Programme
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    <section className="relative min-h-screen w-full overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -29,7 +93,7 @@ export default function Hero() {
       </div>
 
       {/* Content Container - Two Column Layout */}
-      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-36 pb-12 md:pb-20">
+      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 md:pt-48 pb-12 md:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(95vh-10rem)]">
           {/* Left - Text Content */}
           <div>
@@ -77,34 +141,31 @@ export default function Hero() {
               </Link>
             </motion.div>
 
-            {/* Mobile Flyer Banner */}
+            {/* Mobile Flyer */}
             <motion.div
-              className="lg:hidden mt-8"
+              className="lg:hidden mt-8 flex justify-center"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
             >
-              <Link
-                href="/programs/cgcp-on-africa"
-                className="flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-lg"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                  </span>
-                  <span className="text-xs font-semibold text-green-600 uppercase">Open</span>
+              <button onClick={() => setFlyerOpen(true)} className="block relative">
+                <div className="relative">
+                  {/* Shadow cards */}
+                  <div className="absolute inset-0 bg-white/10 rounded-2xl rotate-2 translate-x-2 translate-y-2 border border-white/5" />
+                  <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden w-[320px] sm:w-[360px] md:w-[400px] border border-white/20">
+                    <Image
+                      src="/launchflyer.webp"
+                      alt="CGCP-ON Africa Programme Flyer"
+                      width={400}
+                      height={533}
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-zinc-900 truncate">CGCP-ON Africa</p>
-                  <p className="text-xs text-zinc-500 truncate">Oncology Nurses Certificate Programme</p>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-[#0F766E] flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </div>
-              </Link>
+                <p className="text-center text-white/50 text-xs mt-3 font-medium">
+                  Tap to view flyer
+                </p>
+              </button>
             </motion.div>
           </div>
 
@@ -143,5 +204,6 @@ export default function Hero() {
         </div>
       </div>
     </section>
+    </>
   )
 }
