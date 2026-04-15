@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+// import { useState } from 'react'
+import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-import Image from 'next/image'
+// import Image from 'next/image'
 
 /**
  * Hero Section
@@ -15,12 +15,12 @@ import Image from 'next/image'
 export default function Hero() {
   const t = useTranslations('hero')
   const tCgcp = useTranslations('cgcpOnAfrica')
-  const [flyerOpen, setFlyerOpen] = useState(false)
+  // const [flyerOpen, setFlyerOpen] = useState(false)
 
   return (
     <>
-      {/* Fullscreen flyer overlay (mobile) */}
-      <AnimatePresence>
+      {/* Fullscreen flyer overlay (mobile) - commented out for possible future use */}
+      {/* <AnimatePresence>
         {flyerOpen && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -30,7 +30,6 @@ export default function Hero() {
             className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-4"
             onClick={() => setFlyerOpen(false)}
           >
-            {/* Close button */}
             <button
               onClick={() => setFlyerOpen(false)}
               className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
@@ -39,8 +38,6 @@ export default function Hero() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-
-            {/* Flyer image */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -57,8 +54,6 @@ export default function Hero() {
                 className="w-full h-auto object-contain"
               />
             </motion.div>
-
-            {/* View programme link */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -78,7 +73,7 @@ export default function Hero() {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
     <section className="relative min-h-screen w-full overflow-hidden">
       {/* Background Image */}
@@ -141,8 +136,8 @@ export default function Hero() {
               </Link>
             </motion.div>
 
-            {/* Mobile Flyer */}
-            <motion.div
+            {/* Mobile Flyer - commented out for possible future use */}
+            {/* <motion.div
               className="lg:hidden mt-8 flex justify-center"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -150,7 +145,6 @@ export default function Hero() {
             >
               <button onClick={() => setFlyerOpen(true)} className="block relative">
                 <div className="relative">
-                  {/* Shadow cards */}
                   <div className="absolute inset-0 bg-white/10 rounded-2xl rotate-2 translate-x-2 translate-y-2 border border-white/5" />
                   <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden w-[320px] sm:w-[360px] md:w-[400px] border border-white/20">
                     <Image
@@ -166,11 +160,11 @@ export default function Hero() {
                   Tap to view flyer
                 </p>
               </button>
-            </motion.div>
+            </motion.div> */}
           </div>
 
-          {/* Right - Flyer (desktop only) */}
-          <motion.div
+          {/* Right - Flyer (desktop only) - commented out for possible future use */}
+          {/* <motion.div
             className="hidden lg:flex justify-center items-center"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -183,11 +177,8 @@ export default function Hero() {
                 transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
                 className="relative"
               >
-                {/* Shadow cards behind */}
                 <div className="absolute inset-0 bg-white/10 rounded-3xl -rotate-3 translate-x-4 translate-y-4 border border-white/5" />
                 <div className="absolute inset-0 bg-white/5 rounded-3xl rotate-1 -translate-x-2 translate-y-7 border border-white/5" />
-
-                {/* Main flyer card */}
                 <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden w-[380px] xl:w-[420px] border border-white/20 hover:rotate-0 hover:scale-110 transition-all duration-500 ease-out cursor-pointer group hover:shadow-[0_25px_60px_rgba(0,0,0,0.4)] hover:z-20">
                   <Image
                     src="/launchflyer.webp"
@@ -200,7 +191,7 @@ export default function Hero() {
                 </div>
               </motion.div>
             </Link>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </section>
