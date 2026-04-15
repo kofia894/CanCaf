@@ -498,17 +498,12 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="flex flex-wrap items-center gap-3 mb-6"
               >
-                {applicationsOpen ? (
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500 text-white text-sm font-medium rounded-full">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    {t('acceptingApplications')}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/80 text-white text-sm font-medium rounded-full">
+                {!applicationsOpen && (
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-500/90 text-white text-sm font-medium rounded-full">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
-                    Applications Opening Soon
+                    Applications Closed
                   </span>
                 )}
                 <span className="px-4 py-1.5 bg-[#F59E0B] text-white text-sm font-medium rounded-full">
@@ -574,15 +569,15 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
               >
-                <button
-                  onClick={handleApplyClick}
+                <Link
+                  href="/contact"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F59E0B] text-white rounded-full text-base font-medium motion-fast hover:bg-[#D4A017] hover:-translate-y-0.5 active:scale-[0.98] shadow-lg"
                 >
-                  {t('applyNow')}
+                  Contact Us
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
-                </button>
+                </Link>
               </motion.div>
             </div>
 
@@ -782,28 +777,18 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-              <h3 className="text-xl font-semibold text-white mb-6">{t('readyToApply')}</h3>
+              <h3 className="text-xl font-semibold text-white mb-6">Programme Information</h3>
               <p className="text-white/80 mb-6">
-                {t('readyToApplyDesc')}
+                The maiden cohort of the CGCP-ON Africa programme runs from April to June 2026.
               </p>
 
-              {/* Key Info: Dates & Fee - Only show deadline when applications are open */}
               <div className="space-y-3 mb-6">
-                {applicationsOpen ? (
-                  <div className="flex items-center gap-3 text-white/90">
-                    <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-sm">Applications close: <strong>March 27, 2026</strong></span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3 text-white/90">
-                    <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-sm">Applications opening soon</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-3 text-white/90">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  <span className="text-sm"><strong>Applications are now closed</strong></span>
+                </div>
                 <div className="flex items-center gap-3 text-white/90">
                   <svg className="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -812,19 +797,15 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
                 </div>
               </div>
 
-              <button
-                onClick={handleApplyClick}
-                className={`w-full inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-medium motion-fast active:scale-[0.98] ${
-                  applicationsOpen
-                    ? 'bg-[#F59E0B] text-white hover:bg-[#D4A017]'
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                }`}
+              <Link
+                href="/contact"
+                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-medium motion-fast active:scale-[0.98] bg-white/20 text-white hover:bg-white/30"
               >
-                {applicationsOpen ? t('startApplication') : 'Learn More'}
+                Contact Us
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -886,26 +867,20 @@ export default function CGCPOnAfricaClient({ applicationsOpen }: CGCPOnAfricaCli
       <section className="py-16 md:py-24 bg-gradient-to-br from-zinc-900 via-zinc-900 to-[#0F766E]/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white font-[family-name:var(--font-montserrat)] leading-tight mb-6">
-            {t('ctaTitle')}
+            Interested in Future Programmes?
           </h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto text-lg">
-            {t('ctaDesc')}
+            Applications for the maiden cohort are now closed. Get in touch to learn about upcoming programmes and partnership opportunities.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={handleApplyClick}
+            <Link
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F59E0B] text-white rounded-full text-base font-medium motion-fast hover:bg-[#D4A017] hover:-translate-y-0.5 active:scale-[0.98] shadow-lg"
             >
-              {t('applyNow')}
+              Contact Us
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </button>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white rounded-full text-base font-medium motion-fast hover:bg-white/20 active:scale-[0.98]"
-            >
-              {t('contactUs')}
             </Link>
           </div>
         </div>

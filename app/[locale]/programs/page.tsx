@@ -131,10 +131,6 @@ export default async function ProgramsPage() {
               <div className="relative p-8 md:p-12 lg:p-16">
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-3 mb-6">
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500 text-white text-sm font-medium rounded-full">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    {tCgcp('acceptingApplications')}
-                  </span>
                   <span className="px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full">
                     {tCgcp('flagshipProgramme')}
                   </span>
@@ -152,7 +148,7 @@ export default async function ProgramsPage() {
 
                 {/* CTA */}
                 <span className="inline-flex items-center gap-3 px-6 py-3 bg-[#F59E0B] text-white rounded-full text-base font-medium group-hover:bg-[#D4A017] motion-fast">
-                  {tCgcp('learnAndApply')}
+                  Learn More
                   <svg className="w-5 h-5 group-hover:translate-x-1 motion-fast" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -226,17 +222,17 @@ export default async function ProgramsPage() {
       <section className="py-16 md:py-20 bg-[#0F766E]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white font-[family-name:var(--font-montserrat)] mb-4">
-            {t('ctaTitle')}
+            Interested in Our Programmes?
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            {t('ctaDesc')}
+            Learn more about our cancer care capacity building initiatives or get in touch to explore partnership opportunities.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/programs/cgcp-on-africa"
               className="inline-flex items-center gap-2 px-6 py-3 bg-[#F59E0B] text-white rounded-full text-base font-medium motion-fast hover:bg-[#D4A017] hover:-translate-y-0.5"
             >
-              {t('applyNow')}
+              View CGCP-ON Africa
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

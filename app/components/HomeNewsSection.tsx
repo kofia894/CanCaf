@@ -60,7 +60,8 @@ export default function HomeNewsSection({ news }: HomeNewsSectionProps) {
 
           {/* News Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {news.map((item) => {
+            {news.map((item, index) => {
+              const isFeatured = index === 0
               // Check if item has a Sanity image
               const hasImage = item.image?.asset
               const imageUrl = hasImage ? urlFor(item.image).width(800).height(500).url() : null
@@ -75,7 +76,11 @@ export default function HomeNewsSection({ news }: HomeNewsSectionProps) {
                 <motion.article
                   key={item._id}
                   variants={staggerItem}
-                  className="group bg-white rounded-2xl overflow-hidden border border-zinc-200 hover:border-[#0F766E]/30 motion-fast hover:shadow-lg"
+                  className={`group bg-white rounded-2xl overflow-hidden motion-fast hover:shadow-lg ${
+                    isFeatured
+                      ? 'ring-[10px] ring-[#0F766E]/50 border border-[#0F766E]/50 shadow-md hover:shadow-lg'
+                      : 'border border-zinc-200 hover:border-[#0F766E]/30'
+                  }`}
                 >
                   <Link href={newsUrl} className="block">
                     {/* Image */}
