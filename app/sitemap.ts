@@ -11,11 +11,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '',
     '/about',
     '/programs',
+    '/programs/lit',
     '/programs/cgcp-on-africa',
     '/partners',
     '/news',
     '/contact',
     '/donate',
+    '/privacy',
+    '/terms',
   ]
 
   // Generate static page entries for all locales

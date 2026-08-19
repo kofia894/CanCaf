@@ -53,6 +53,11 @@ export default function Footer() {
     { label: nav('partners'), href: '/partners' as const },
   ]
 
+  const legalLinks = [
+    { label: 'Privacy Policy', href: '/privacy' as const },
+    { label: 'Terms of Service', href: '/terms' as const },
+  ]
+
   return (
     <footer className="bg-[#0a3d38] text-white">
       {/* Main Footer Content */}
@@ -145,12 +150,22 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-white/10 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-white/50 text-sm">
+            <p className="text-white/50 text-sm order-2 md:order-1">
               © {new Date().getFullYear()} CanCAF. {t('rights')}
             </p>
-            <p className="text-white/50 text-sm">
-              {t('tagline')}
-            </p>
+
+            {/* Legal */}
+            <div className="flex items-center gap-5 order-1 md:order-2">
+              {legalLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-white/50 hover:text-[#F59E0B] motion-colors text-sm focus-ring"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

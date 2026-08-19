@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
+import { Link } from '@/i18n/routing'
 import { submitLitRegistration, LitRegistrationData } from '../actions/submitLitRegistration'
 import { AGE_RANGES, PROFESSIONS, LEADERSHIP_AREAS } from '../lib/litOptions'
 
@@ -781,6 +782,26 @@ export default function LITRegistrationForm() {
                   <span className="text-sm text-zinc-600 leading-relaxed">
                     I consent to participate in the LIT programme and to receive programme
                     communications from CanCAF. <span className="text-red-500">*</span>
+                    <br />
+                    <span className="text-xs text-zinc-500">
+                      Your information is handled in line with our{' '}
+                      <Link
+                        href="/privacy"
+                        target="_blank"
+                        className="text-[#0F766E] hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>{' '}
+                      and{' '}
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        className="text-[#0F766E] hover:underline"
+                      >
+                        Terms of Service
+                      </Link>
+                      .
+                    </span>
                   </span>
                 </label>
               </div>
