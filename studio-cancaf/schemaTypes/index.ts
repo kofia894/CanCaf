@@ -5,5 +5,6 @@ import {notificationInterestType} from './notificationInterestType'
 import {donationType} from './donationType'
 import {applicationRegistrationType} from './applicationRegistrationType'
 import {attendanceType} from './attendanceType'
+import {litRegistrationType} from './litRegistrationType'
 
-export const schemaTypes = [newsType, applicationType, siteSettingsType, notificationInterestType, donationType, applicationRegistrationType, attendanceType]
+export const schemaTypes = [newsType, applicationType, siteSettingsType, notificationInterestType, donationType, applicationRegistrationType, attendanceType, litRegistrationType]

@@ -15,10 +15,25 @@ export const donationType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'paymentReference',
+      title: 'Payment Reference',
+      type: 'string',
+      readOnly: true,
+      description: 'Paystack transaction reference (matches Client Reference)',
+    }),
+    defineField({
       name: 'checkoutId',
       title: 'Checkout ID',
       type: 'string',
       readOnly: true,
+      description: 'Legacy Hubtel checkout ID — not used for Paystack donations',
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+      readOnly: true,
+      initialValue: 'GHS',
     }),
     defineField({
       name: 'amount',
@@ -106,6 +121,13 @@ export const donationType = defineType({
       type: 'text',
       readOnly: true,
       description: 'Raw transaction status check response from Hubtel',
+    }),
+    defineField({
+      name: 'paystackResponse',
+      title: 'Paystack Verification Data',
+      type: 'text',
+      readOnly: true,
+      description: 'Raw verification response from Paystack',
     }),
   ],
   preview: {

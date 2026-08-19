@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeClient } from '@/app/lib/sanity'
+import { generateReference, initializeTransaction, DEFAULT_CURRENCY } from '@/app/lib/paystack'
+import { getBaseUrl } from '@/app/lib/baseUrl'
+
+/**
+ * Start a donation payment via Paystack.
+ *
+ * Returns `checkoutUrl` to keep the existing DonateClient contract — it just
+ * redirects the browser there. Confirmation happens in
+ * /api/paystack/webhook, keyed on the `DON-` reference prefix.
+ */
 
 interface DonationRequest {
   amount: number
@@ -17,118 +27,78 @@ export async function POST(request: NextRequest) {
     const body: DonationRequest = await request.json()
     const { amount, donorInfo } = body
 
-    // Validate required fields
     if (!amount || amount <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid amount' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
 
-    if (!donorInfo.firstName || !donorInfo.lastName || !donorInfo.email) {
+    if (!donorInfo?.firstName || !donorInfo?.lastName || !donorInfo?.email) {
       return NextResponse.json(
         { error: 'Missing required donor information' },
         { status: 400 }
       )
     }
 
-    // Generate unique client reference
-    const clientReference = `DON-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-
-    // Get base URL for callbacks
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cancaf.org'
-
-    // Hubtel API credentials
-    const hubtelClientId = process.env.HUBTEL_CLIENT_ID
-    const hubtelClientSecret = process.env.HUBTEL_CLIENT_SECRET
-    const hubtelMerchantAccountNumber = process.env.HUBTEL_MERCHANT_ACCOUNT_NUMBER
-
-    if (!hubtelClientId || !hubtelClientSecret || !hubtelMerchantAccountNumber) {
-      console.error('Missing Hubtel credentials')
-      return NextResponse.json(
-        { error: 'Payment service not configured' },
-        { status: 500 }
-      )
+    if (!process.env.PAYSTACK_SECRET_KEY) {
+      console.error('Missing PAYSTACK_SECRET_KEY')
+      return NextResponse.json({ error: 'Payment service not configured' }, { status: 500 })
     }
 
-    // Create Basic Auth header
-    const authString = Buffer.from(`${hubtelClientId}:${hubtelClientSecret}`).toString('base64')
+    const reference = generateReference('DON')
+    // Resolved from the request so local, preview and production each return
+    // to their own success page
+    const baseUrl = await getBaseUrl()
+    const donorEmail = donorInfo.email.toLowerCase().trim()
+    const donorName = `${donorInfo.firstName} ${donorInfo.lastName}`.trim()
+    const donationAmount = parseFloat(amount.toFixed(2))
 
-    // Amount is already in GHS
-    const amountInGHS = amount
+    // Record the intent before leaving for Paystack so an abandoned payment
+    // is still visible to the team
+    let donationId: string | null = null
 
-    // Prepare description
-    const donorName = `${donorInfo.firstName} ${donorInfo.lastName}`
-    const description = `CanCAF Donation from ${donorName}`
-
-    // Prepare Hubtel request payload
-    const hubtelPayload = {
-      totalAmount: parseFloat(amountInGHS.toFixed(2)),
-      description,
-      callbackUrl: `${baseUrl}/api/donate/callback`,
-      returnUrl: `${baseUrl}/donate/success?ref=${clientReference}`,
-      merchantAccountNumber: hubtelMerchantAccountNumber,
-      cancellationUrl: `${baseUrl}/donate/cancelled?ref=${clientReference}`,
-      clientReference,
-      payeeName: `${donorInfo.firstName} ${donorInfo.lastName}`,
-      payeeMobileNumber: donorInfo.phone || undefined,
-      payeeEmail: donorInfo.email,
-    }
-
-    // Call Hubtel API
-    const hubtelResponse = await fetch('https://payproxyapi.hubtel.com/items/initiate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${authString}`,
-        'Cache-Control': 'no-cache',
-      },
-      body: JSON.stringify(hubtelPayload),
-    })
-
-    const hubtelData = await hubtelResponse.json()
-
-    if (hubtelData.responseCode !== '0000' || hubtelData.status !== 'Success') {
-      console.error('Hubtel API error:', hubtelData)
-      return NextResponse.json(
-        { error: 'Failed to initiate payment', details: hubtelData },
-        { status: 500 }
-      )
-    }
-
-    // Store donation in Sanity with pending status
     try {
-      await writeClient.create({
+      const created = await writeClient.create({
         _type: 'donation',
-        clientReference,
-        checkoutId: hubtelData.data.checkoutId,
-        amount: amountInGHS,
+        clientReference: reference,
+        paymentReference: reference,
+        amount: donationAmount,
+        currency: DEFAULT_CURRENCY,
         status: 'pending',
-        donorFirstName: donorInfo.firstName,
-        donorLastName: donorInfo.lastName,
-        donorEmail: donorInfo.email,
-        donorPhone: donorInfo.phone || '',
-        message: donorInfo.message || '',
+        donorFirstName: donorInfo.firstName.trim(),
+        donorLastName: donorInfo.lastName.trim(),
+        donorEmail,
+        donorPhone: donorInfo.phone?.trim() || '',
+        message: donorInfo.message?.trim() || '',
       })
-      console.log(`Donation record created in Sanity: ${clientReference}`)
+      donationId = created._id
     } catch (sanityError) {
       console.error('Failed to create donation in Sanity:', sanityError)
-      // Continue anyway - payment was initiated successfully
+      // Continue — the webhook can still reconcile by reference
     }
+
+    const { authorizationUrl } = await initializeTransaction({
+      email: donorEmail,
+      amount: donationAmount,
+      currency: DEFAULT_CURRENCY,
+      reference,
+      callbackUrl: `${baseUrl}/donate/success?ref=${encodeURIComponent(reference)}`,
+      metadata: {
+        purpose: 'donation',
+        donationId,
+        donorName,
+        donorPhone: donorInfo.phone || '',
+        message: donorInfo.message || '',
+      },
+    })
 
     return NextResponse.json({
       success: true,
-      checkoutUrl: hubtelData.data.checkoutUrl,
-      checkoutId: hubtelData.data.checkoutId,
-      clientReference: hubtelData.data.clientReference,
-      // For onsite checkout (iframe)
-      checkoutDirectUrl: hubtelData.data.checkoutDirectUrl,
+      checkoutUrl: authorizationUrl,
+      clientReference: reference,
     })
-
   } catch (error) {
     console.error('Donation initiation error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     )
   }

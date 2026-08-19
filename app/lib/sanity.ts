@@ -103,13 +103,20 @@ export interface SiteSettings {
   cgcponApplicationsOpen: boolean;
   cgcponClosedMessage: string;
   cgcponRegistrationFee: number;
+  litRegistrationOpen: boolean;
+  /** LIT fee in major units. 0 means registration is free and skips payment. */
+  litRegistrationFee: number;
+  litRegistrationCurrency: string;
 }
 
 // Query for site settings (singleton document)
 export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   cgcponApplicationsOpen,
   cgcponClosedMessage,
-  cgcponRegistrationFee
+  cgcponRegistrationFee,
+  litRegistrationOpen,
+  litRegistrationFee,
+  litRegistrationCurrency
 }`;
 
 // Fetch site settings with shorter revalidation for quick updates

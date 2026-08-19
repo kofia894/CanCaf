@@ -34,6 +34,37 @@ export const siteSettingsType = defineType({
       initialValue: 50,
       validation: (rule) => rule.required().positive(),
     }),
+    defineField({
+      name: 'litRegistrationOpen',
+      title: 'LIT Registration Open',
+      type: 'boolean',
+      description: 'Toggle to open or close registration for the LIT leadership series.',
+      initialValue: true,
+    }),
+    defineField({
+      name: 'litRegistrationFee',
+      title: 'LIT Registration Fee',
+      type: 'number',
+      description: 'Amount participants pay to register for LIT, in the currency selected below. Set to 0 to make registration free (participants skip payment entirely).',
+      initialValue: 0,
+      validation: (rule) => rule.required().min(0),
+    }),
+    defineField({
+      name: 'litRegistrationCurrency',
+      title: 'LIT Registration Currency',
+      type: 'string',
+      description: 'Currency charged via Paystack. USD requires multi-currency to be enabled on the Paystack account.',
+      options: {
+        list: [
+          {title: 'Ghana Cedis (GHS)', value: 'GHS'},
+          {title: 'US Dollars (USD)', value: 'USD'},
+          {title: 'Nigerian Naira (NGN)', value: 'NGN'},
+          {title: 'South African Rand (ZAR)', value: 'ZAR'},
+          {title: 'Kenyan Shilling (KES)', value: 'KES'},
+        ],
+      },
+      initialValue: 'GHS',
+    }),
   ],
   preview: {
     prepare() {
