@@ -7,6 +7,7 @@ import 'react-phone-number-input/style.css'
 import { Link } from '@/i18n/routing'
 import { submitLitRegistration, LitRegistrationData } from '../actions/submitLitRegistration'
 import { AGE_RANGES, PROFESSIONS, LEADERSHIP_AREAS } from '../lib/litOptions'
+import { COUNTRIES } from '../lib/countries'
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -449,14 +450,20 @@ export default function LITRegistrationForm() {
                   <label htmlFor="country" className={labelClass}>
                     Country <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="country"
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
                     className={inputClass}
-                  />
+                  >
+                    <option value="">Select your country</option>
+                    {COUNTRIES.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </motion.div>

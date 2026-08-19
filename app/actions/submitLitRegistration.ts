@@ -5,6 +5,7 @@ import { generateReference, initializeTransaction, DEFAULT_CURRENCY } from '@/ap
 import { sendLitRegistrationEmails } from '@/app/lib/litRegistration'
 import { getBaseUrl } from '@/app/lib/baseUrl'
 import { AGE_RANGES, PROFESSIONS, LEADERSHIP_AREAS, YES_NO } from '@/app/lib/litOptions'
+import { isValidCountry } from '@/app/lib/countries'
 
 export interface LitRegistrationData {
   fullName: string
@@ -119,6 +120,13 @@ export async function submitLitRegistration(
       return {
         success: false,
         message: `Please choose a valid option for ${invalidChoice.label}.`,
+      }
+    }
+
+    if (!isValidCountry(formData.country.trim())) {
+      return {
+        success: false,
+        message: 'Please select your country from the list.',
       }
     }
 
