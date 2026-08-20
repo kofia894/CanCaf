@@ -159,9 +159,27 @@ export async function submitLitRegistration(
       }
     }
 
-    const fee = settings?.litRegistrationFee ?? 0
-    const currency = settings?.litRegistrationCurrency || DEFAULT_CURRENCY
-    const requiresPayment = fee > 0
+    // Participants are quoted in USD; Paystack is a GHS-only account, so the
+    // charge is converted here using an internally-held rate. Paystack itself
+    // does no conversion — it charges exactly the currency and amount we send.
+    const feeUsd = settings?.litRegistrationFee ?? 0
+    const usdToGhs = settings?.litUsdToGhsRate ?? 0
+    const requiresPayment = feeUsd > 0
+
+    if (requiresPayment && usdToGhs <= 0) {
+      console.error(
+        'LIT registration: litRegistrationFee is set but litUsdToGhsRate is missing — refusing to charge an unknown amount'
+      )
+      return {
+        success: false,
+        message:
+          'Registration is temporarily unavailable while we update our payment settings. Please try again shortly, or contact us.',
+      }
+    }
+
+    // Round to whole pesewas so the charge is exact
+    const chargeAmount = Math.round(feeUsd * usdToGhs * 100) / 100
+    const currency = DEFAULT_CURRENCY
 
     // Block only registrations that actually completed; a pending or failed
     // payment should be able to try again.
@@ -206,6 +224,9 @@ export async function submitLitRegistration(
       paymentStatus: requiresPayment ? 'pending' : 'not_required',
       paymentReference: requiresPayment ? reference : undefined,
       currency: requiresPayment ? currency : undefined,
+      // What the participant was quoted, kept for reconciling disputes
+      displayAmountUsd: requiresPayment ? feeUsd : undefined,
+      usdToGhsRateUsed: requiresPayment ? usdToGhs : undefined,
       confirmationEmailSent: false,
     })
 
@@ -232,13 +253,15 @@ export async function submitLitRegistration(
     try {
       const { authorizationUrl } = await initializeTransaction({
         email,
-        amount: fee,
+        amount: chargeAmount,
         currency,
         reference,
         callbackUrl: `${baseUrl}/programs/lit/payment-success?ref=${encodeURIComponent(reference)}`,
         metadata: {
           programme: 'LIT',
           registrationId: created._id,
+          displayAmountUsd: feeUsd,
+          usdToGhsRate: usdToGhs,
           fullName: formData.fullName.trim(),
           country: formData.country.trim(),
         },

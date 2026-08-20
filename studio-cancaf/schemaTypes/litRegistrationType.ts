@@ -279,6 +279,22 @@ export const litRegistrationType = defineType({
       readOnly: true,
     }),
     defineField({
+      name: 'displayAmountUsd',
+      title: 'Price Quoted (USD)',
+      type: 'number',
+      group: 'meta',
+      readOnly: true,
+      description: 'The dollar figure this participant was shown at registration',
+    }),
+    defineField({
+      name: 'usdToGhsRateUsed',
+      title: 'USD to GHS Rate Used',
+      type: 'number',
+      group: 'meta',
+      readOnly: true,
+      description: 'The rate in force when this registration was charged, kept for reconciling disputes',
+    }),
+    defineField({
       name: 'currency',
       title: 'Currency',
       type: 'string',

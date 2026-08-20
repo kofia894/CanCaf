@@ -104,9 +104,10 @@ export interface SiteSettings {
   cgcponClosedMessage: string;
   cgcponRegistrationFee: number;
   litRegistrationOpen: boolean;
-  /** LIT fee in major units. 0 means registration is free and skips payment. */
+  /** Price shown to participants, in USD. 0 means free and skips payment. */
   litRegistrationFee: number;
-  litRegistrationCurrency: string;
+  /** Cedis per US dollar. Internal only — never shown, never sent to Paystack. */
+  litUsdToGhsRate: number;
 }
 
 // Query for site settings (singleton document)
@@ -116,7 +117,7 @@ export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   cgcponRegistrationFee,
   litRegistrationOpen,
   litRegistrationFee,
-  litRegistrationCurrency
+  litUsdToGhsRate
 }`;
 
 // Fetch site settings with shorter revalidation for quick updates

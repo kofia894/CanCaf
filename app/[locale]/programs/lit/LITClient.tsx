@@ -9,9 +9,12 @@ interface LITClientProps {
   /** Path to the programme flyer in /public, or null if it hasn't been added yet. */
   flyerSrc: string | null
   registrationOpen: boolean
-  /** Registration fee in major units. 0 means free — no payment step. */
-  fee: number
-  currency: string
+  /**
+   * Price shown to participants, in USD. 0 means free — no payment step.
+   * The cedi amount actually charged is worked out server-side and is
+   * deliberately not surfaced here.
+   */
+  feeUsd: number
 }
 
 /**
@@ -47,7 +50,7 @@ const HIGHLIGHTS = [
   'Lead from where you stand',
   'Move people, move care',
   'Build the future ward',
-  'Interactive learning & pan-African networking',
+  'Interactive learning & networking',
 ]
 
 const AUDIENCE = [
@@ -78,10 +81,11 @@ const FACULTY = [
 export default function LITClient({
   flyerSrc,
   registrationOpen,
-  fee,
-  currency,
+  feeUsd,
 }: LITClientProps) {
-  const hasFee = fee > 0
+  const hasFee = feeUsd > 0
+  // Trim a trailing .00 so a whole-dollar price reads as "$25", not "$25.00"
+  const formattedFee = Number.isInteger(feeUsd) ? `$${feeUsd}` : `$${feeUsd.toFixed(2)}`
 
   return (
     <div className="bg-zinc-50">
@@ -171,7 +175,7 @@ export default function LITClient({
                 <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200 shadow-lg bg-white">
                   <Image
                     src={flyerSrc}
-                    alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual on Teams, 1:00–3:30 PM GMT daily. For CPD points"
+                    alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual, 1:00–3:30 PM GMT daily. CPD accredited."
                     width={762}
                     height={1080}
                     className="w-full h-auto"
@@ -276,7 +280,7 @@ export default function LITClient({
                       </div>
                       <div>
                         <p className="font-semibold text-zinc-900">
-                          Registration fee: {currency} {fee.toFixed(2)}
+                          Registration fee: {formattedFee}
                         </p>
                         <p className="text-xs text-zinc-600">
                           Payable securely by card or mobile money after the final step.

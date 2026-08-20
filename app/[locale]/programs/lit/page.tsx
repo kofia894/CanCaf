@@ -12,7 +12,7 @@ import LITClient from './LITClient'
 export const metadata: Metadata = {
   title: 'LIT - Leadership Development Series for Nurses & Midwives',
   description:
-    'Register for LIT, the CanCAF Leadership Development Series for Nurses & Midwives. 27-29 August 2026, virtual on Teams, 1:00-3:30 PM GMT daily. For CPD points',
+    'Register for LIT, the CanCAF Leadership Development Series for Nurses & Midwives. 27-29 August 2026, virtual, 1:00-3:30 PM GMT daily. CPD accredited.',
   keywords: [
     'LIT',
     'leadership development',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'LIT - Leadership Development Series for Nurses & Midwives',
     description:
-      'Lead. Influence. Transform. 27-29 August 2026, virtual on Teams. CPD accredited. Registration is now open.',
+      'Lead. Influence. Transform. 27-29 August 2026, virtual. CPD accredited. Registration is now open.',
     images: ['/litflyer.webp'],
   },
 }
@@ -68,8 +68,7 @@ export default async function LITPage() {
     <LITClient
       flyerSrc={resolveFlyer()}
       registrationOpen={settings?.litRegistrationOpen ?? true}
-      fee={settings?.litRegistrationFee ?? 0}
-      currency={settings?.litRegistrationCurrency || 'GHS'}
+      feeUsd={settings?.litRegistrationFee ?? 0}
     />
   )
 }

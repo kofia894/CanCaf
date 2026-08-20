@@ -43,27 +43,21 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: 'litRegistrationFee',
-      title: 'LIT Registration Fee',
+      title: 'LIT Registration Fee (USD)',
       type: 'number',
-      description: 'Amount participants pay to register for LIT, in the currency selected below. Set to 0 to make registration free (participants skip payment entirely).',
+      description:
+        'Price shown to participants, in US dollars. Set to 0 to make registration free (participants skip payment entirely).',
       initialValue: 0,
       validation: (rule) => rule.required().min(0),
     }),
     defineField({
-      name: 'litRegistrationCurrency',
-      title: 'LIT Registration Currency',
-      type: 'string',
-      description: 'Currency charged via Paystack. USD requires multi-currency to be enabled on the Paystack account.',
-      options: {
-        list: [
-          {title: 'Ghana Cedis (GHS)', value: 'GHS'},
-          {title: 'US Dollars (USD)', value: 'USD'},
-          {title: 'Nigerian Naira (NGN)', value: 'NGN'},
-          {title: 'South African Rand (ZAR)', value: 'ZAR'},
-          {title: 'Kenyan Shilling (KES)', value: 'KES'},
-        ],
-      },
-      initialValue: 'GHS',
+      name: 'litUsdToGhsRate',
+      title: 'USD to GHS rate (internal)',
+      type: 'number',
+      description:
+        'How many cedis one US dollar is worth. Used only to work out the amount charged — participants never see this number, and Paystack never sees dollars. Required whenever the fee above is greater than 0. Review it whenever the rate moves.',
+      initialValue: 0,
+      validation: (rule) => rule.min(0),
     }),
   ],
   preview: {
