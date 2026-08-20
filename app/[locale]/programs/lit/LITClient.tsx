@@ -34,11 +34,11 @@ const KEY_DETAILS = [
     icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
   },
   {
-    label: 'Virtual — on Teams',
+    label: 'Virtual',
     icon: 'M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z',
   },
   {
-    label: 'CPD accredited (NMC Ghana)',
+    label: 'CPD accredited',
     icon: 'M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z',
   },
 ]
@@ -171,7 +171,7 @@ export default function LITClient({
                 <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200 shadow-lg bg-white">
                   <Image
                     src={flyerSrc}
-                    alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual on Teams, 1:00–3:30 PM GMT daily. CPD accredited by the Nursing and Midwifery Council of Ghana."
+                    alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual on Teams, 1:00–3:30 PM GMT daily. For CPD points"
                     width={762}
                     height={1080}
                     className="w-full h-auto"

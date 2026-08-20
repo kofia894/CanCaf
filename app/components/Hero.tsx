@@ -1,10 +1,18 @@
 'use client'
 
-// import { useState } from 'react'
+import Image from 'next/image'
 import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
-// import Image from 'next/image'
+
+interface HeroProps {
+  /**
+   * Show the upcoming-programme flyer beside the headline. Driven by the
+   * `litRegistrationOpen` toggle in Sanity, so the team can retire it from the
+   * Studio once the cohort has run instead of needing a deploy.
+   */
+  showUpcomingFlyer?: boolean
+}
 
 /**
  * Hero Section
@@ -12,69 +20,11 @@ import { Link } from '@/i18n/routing'
  * Animation: Simple fade-up with staggered reveal
  */
 
-export default function Hero() {
+export default function Hero({ showUpcomingFlyer = false }: HeroProps) {
   const t = useTranslations('hero')
-  const tCgcp = useTranslations('cgcpOnAfrica')
-  // const [flyerOpen, setFlyerOpen] = useState(false)
 
   return (
     <>
-      {/* Fullscreen flyer overlay (mobile) - commented out for possible future use */}
-      {/* <AnimatePresence>
-        {flyerOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-4"
-            onClick={() => setFlyerOpen(false)}
-          >
-            <button
-              onClick={() => setFlyerOpen(false)}
-              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="w-full max-w-md max-h-[85vh] overflow-hidden rounded-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src="/launchflyer.webp"
-                alt="CGCP-ON Africa Programme Flyer"
-                width={600}
-                height={800}
-                className="w-full h-auto object-contain"
-              />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-4"
-            >
-              <Link
-                href="/programs/cgcp-on-africa"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0F766E] text-white rounded-full text-sm font-semibold shadow-lg"
-                onClick={() => setFlyerOpen(false)}
-              >
-                View Programme
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </Link>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence> */}
-
     <section className="relative min-h-screen w-full overflow-hidden">
       {/* Background Image */}
       <div
@@ -136,6 +86,38 @@ export default function Hero() {
               </Link>
             </motion.div>
 
+            {/* Upcoming programme flyer (mobile / tablet) */}
+            {showUpcomingFlyer && (
+              <motion.div
+                className="lg:hidden mt-10 flex justify-center"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+              >
+                <Link href="/programs/lit" className="block relative group">
+                  <div className="relative w-[280px] sm:w-[320px] rounded-2xl overflow-hidden bg-white border border-white/20 shadow-xl">
+                    <Image
+                      src="/litflyer.webp"
+                      alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual, 1:00–3:30 PM GMT daily."
+                      width={762}
+                      height={1080}
+                      className="w-full h-auto"
+                    />
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F59E0B] text-white text-[11px] font-semibold rounded-full shadow-lg">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+                      </span>
+                      Registration Open
+                    </span>
+                  </div>
+                  <p className="text-center text-white/60 text-xs mt-3 font-medium">
+                    Tap to register for LIT
+                  </p>
+                </Link>
+              </motion.div>
+            )}
+
             {/* Mobile Flyer - commented out for possible future use */}
             {/* <motion.div
               className="lg:hidden mt-8 flex justify-center"
@@ -162,6 +144,55 @@ export default function Hero() {
               </button>
             </motion.div> */}
           </div>
+
+          {/* Right - Upcoming programme flyer (desktop) */}
+          {showUpcomingFlyer && (
+            <motion.div
+              className="hidden lg:flex justify-center items-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+            >
+              <Link href="/programs/lit" className="block group">
+                <div className="relative">
+                  {/* Stacked panels behind, for depth */}
+                  <div className="absolute inset-0 bg-white/10 rounded-3xl -rotate-3 translate-x-4 translate-y-4 border border-white/5" />
+                  <div className="absolute inset-0 bg-white/5 rounded-3xl rotate-1 -translate-x-2 translate-y-7 border border-white/5" />
+
+                  {/* Flyer */}
+                  <div className="relative w-[360px] xl:w-[400px] rounded-3xl overflow-hidden bg-white border border-white/20 shadow-2xl rotate-[3deg] group-hover:rotate-0 group-hover:-translate-y-1.5 motion-slow group-hover:shadow-[0_28px_70px_rgba(0,0,0,0.45)]">
+                    <Image
+                      src="/litflyer.webp"
+                      alt="LIT — Leadership Development Series for Nurses & Midwives. 27–29 August 2026, virtual, 1:00–3:30 PM GMT daily."
+                      width={762}
+                      height={1080}
+                      className="w-full h-auto"
+                      priority
+                    />
+
+                    {/* Registration badge */}
+                    <span className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#F59E0B] text-white text-xs font-semibold rounded-full shadow-lg">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+                      </span>
+                      Registration Open
+                    </span>
+
+                    {/* Caption on hover */}
+                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 motion-slow">
+                      <span className="inline-flex items-center gap-2 text-white text-sm font-medium">
+                        Register for LIT
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          )}
 
           {/* Right - Flyer (desktop only) - commented out for possible future use */}
           {/* <motion.div

@@ -12,7 +12,7 @@ import LITClient from './LITClient'
 export const metadata: Metadata = {
   title: 'LIT - Leadership Development Series for Nurses & Midwives',
   description:
-    'Register for LIT, the CanCAF Leadership Development Series for Nurses & Midwives. 27-29 August 2026, virtual on Teams, 1:00-3:30 PM GMT daily. CPD accredited by the Nursing and Midwifery Council of Ghana.',
+    'Register for LIT, the CanCAF Leadership Development Series for Nurses & Midwives. 27-29 August 2026, virtual on Teams, 1:00-3:30 PM GMT daily. For CPD points',
   keywords: [
     'LIT',
     'leadership development',

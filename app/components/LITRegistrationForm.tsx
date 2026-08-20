@@ -7,6 +7,8 @@ import 'react-phone-number-input/style.css'
 import { Link } from '@/i18n/routing'
 import { submitLitRegistration, LitRegistrationData } from '../actions/submitLitRegistration'
 import { AGE_RANGES, PROFESSIONS, LEADERSHIP_AREAS } from '../lib/litOptions'
+import { isValidEmail } from '../lib/email'
+import { isValidPhone, PHONE_ERROR_MESSAGE } from '../lib/phone'
 import { COUNTRIES } from '../lib/countries'
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
@@ -130,6 +132,8 @@ export default function LITRegistrationForm() {
   const [formState, setFormState] = useState<FormState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [formData, setFormData] = useState<LitRegistrationData>(EMPTY_FORM)
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [phoneTouched, setPhoneTouched] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const update = <K extends keyof LitRegistrationData>(
@@ -168,8 +172,12 @@ export default function LITRegistrationForm() {
       return `Please complete: ${missing.map((f) => f.label).join(', ')}.`
     }
 
-    if (step === 1 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+    if (step === 1 && !isValidEmail(formData.email)) {
       return 'Please enter a valid email address.'
+    }
+
+    if (step === 1 && !isValidPhone(formData.phone)) {
+      return PHONE_ERROR_MESSAGE
     }
 
     if (step === 2 && formData.profession === 'Other' && !formData.professionOther.trim()) {
@@ -186,6 +194,11 @@ export default function LITRegistrationForm() {
 
     return null
   }
+
+  // Only flag a bad address once the user has left the field, so it does not
+  // shout while they are still typing it
+  const showEmailError = emailTouched && formData.email.trim() !== '' && !isValidEmail(formData.email)
+  const showPhoneError = phoneTouched && formData.phone.trim() !== '' && !isValidPhone(formData.phone)
 
   const scrollToTop = () => {
     containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -252,6 +265,8 @@ export default function LITRegistrationForm() {
       if (result.success) {
         setFormState('success')
         setFormData(EMPTY_FORM)
+        setEmailTouched(false)
+        setPhoneTouched(false)
         scrollToTop()
       } else {
         setFormState('error')
@@ -405,8 +420,18 @@ export default function LITRegistrationForm() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={inputClass}
+                    onBlur={() => setEmailTouched(true)}
+                    aria-invalid={showEmailError || undefined}
+                    aria-describedby={showEmailError ? 'email-error' : undefined}
+                    className={`${inputClass} ${
+                      showEmailError ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''
+                    }`}
                   />
+                  {showEmailError && (
+                    <p id="email-error" className="mt-1.5 text-xs text-red-600">
+                      Please enter a valid email address, e.g. name@example.com
+                    </p>
+                  )}
                 </div>
 
                 {/* 3. Age Range */}
@@ -441,8 +466,12 @@ export default function LITRegistrationForm() {
                     defaultCountry="GH"
                     value={formData.phone}
                     onChange={(value) => update('phone', value || '')}
-                    className="phone-input-wrapper"
+                    onBlur={() => setPhoneTouched(true)}
+                    className={`phone-input-wrapper ${showPhoneError ? 'phone-input-error' : ''}`}
                   />
+                  {showPhoneError && (
+                    <p className="mt-1.5 text-xs text-red-600">{PHONE_ERROR_MESSAGE}</p>
+                  )}
                 </div>
 
                 {/* 5. Country */}

@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
+import { isValidEmail } from '@/app/lib/email'
+import { isValidPhone, PHONE_ERROR_MESSAGE } from '@/app/lib/phone'
 
 // Preset amounts in GHS (Ghana Cedis)
 const presetAmounts = [50, 100, 200, 500, 1000, 2000]
@@ -32,16 +36,9 @@ export default function DonateClient() {
   const [emailError, setEmailError] = useState<string | null>(null)
   const [phoneError, setPhoneError] = useState<string | null>(null)
 
-  // Email validation function
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    return emailRegex.test(email)
-  }
-
-  // Phone validation function (basic check for non-empty)
-  const validatePhone = (phone: string): boolean => {
-    return phone.trim().length >= 10
-  }
+  // Validation is shared with the server actions so both sides agree
+  const validateEmail = isValidEmail
+  const validatePhone = isValidPhone
 
   const getFinalAmount = () => {
     if (customAmount) {
@@ -83,7 +80,7 @@ export default function DonateClient() {
 
     // Validate phone
     if (!validatePhone(donorInfo.phone)) {
-      setPhoneError('Please enter a valid phone number')
+      setPhoneError(PHONE_ERROR_MESSAGE)
       hasErrors = true
     } else {
       setPhoneError(null)
@@ -277,23 +274,18 @@ export default function DonateClient() {
 
         <div>
           <label className="block text-sm text-zinc-600 mb-1">{t('phone')} *</label>
-          <input
-            type="tel"
+          <PhoneInput
+            international
+            defaultCountry="GH"
             value={donorInfo.phone}
-            onChange={(e) => {
-              // Only allow numbers
-              const numbersOnly = e.target.value.replace(/[^0-9]/g, '')
-              handleDonorInfoChange('phone', numbersOnly)
-              if (phoneError && validatePhone(numbersOnly)) {
+            onChange={(value) => {
+              const next = value || ''
+              handleDonorInfoChange('phone', next)
+              if (phoneError && validatePhone(next)) {
                 setPhoneError(null)
               }
             }}
-            className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${
-              phoneError
-                ? 'border-red-500 focus:border-red-500'
-                : 'border-zinc-200 focus:border-[#0F766E]'
-            }`}
-            required
+            className={`phone-input-wrapper ${phoneError ? 'phone-input-error' : ''}`}
           />
           {phoneError && (
             <p className="text-red-500 text-xs mt-1">{phoneError}</p>

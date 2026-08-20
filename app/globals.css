@@ -483,6 +483,17 @@ h1, h2, h3, h4, h5, h6 {
   color: #a1a1aa;
 }
 
+/* Error state — applied alongside .phone-input-wrapper when validation fails */
+.phone-input-error .PhoneInputInput,
+.phone-input-error .PhoneInputCountry {
+  border-color: #ef4444;
+}
+
+.phone-input-error .PhoneInputInput:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
 /* Prose-like styles for rich text content */
 .prose ul {
   list-style-type: disc;

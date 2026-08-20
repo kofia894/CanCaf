@@ -1,6 +1,7 @@
 'use server'
 
 import { Resend } from 'resend'
+import { isValidEmail, normalizeEmail } from '@/app/lib/email'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -29,13 +30,20 @@ export async function submitContactForm(
       }
     }
 
+    if (!isValidEmail(formData.email)) {
+      return {
+        success: false,
+        message: 'Please enter a valid email address.',
+      }
+    }
+
     // Send email to CanCAF team
     if (process.env.RESEND_API_KEY) {
       // Send notification to team
       await resend.emails.send({
         from: 'CanCAF Website <onboarding@resend.dev>',
         to: 'info@cancaf.org',
-        replyTo: formData.email,
+        replyTo: normalizeEmail(formData.email),
         subject: `Contact Form: ${formData.subject}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -94,7 +102,7 @@ export async function submitContactForm(
       // Send confirmation to the user
       await resend.emails.send({
         from: 'CanCAF <onboarding@resend.dev>',
-        to: formData.email,
+        to: normalizeEmail(formData.email),
         subject: 'Thank you for contacting CanCAF',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

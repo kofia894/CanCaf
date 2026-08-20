@@ -120,7 +120,7 @@ export default async function ProgramsPage() {
                     27 – 29 August 2026
                   </span>
                   <span className="px-4 py-1.5 bg-white/20 text-white text-sm font-medium rounded-full">
-                    Virtual — on Teams
+                    Virtual
                   </span>
                 </div>
 
@@ -137,8 +137,7 @@ export default async function ProgramsPage() {
                 <p className="text-white/85 text-lg leading-relaxed max-w-2xl mb-8">
                   Develop the leader within. Influence others. Transform healthcare. A flagship
                   leadership initiative of the 2025 Aster Guardians Global Nursing Award winner,
-                  Mrs. Naomi Oyoe Ohene Oti — CPD accredited by the Nursing and Midwifery Council
-                  of Ghana.
+                  Mrs. Naomi Oyoe Ohene Oti — For CPD Points
                 </p>
 
                 {/* CTA */}

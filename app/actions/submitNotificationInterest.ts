@@ -2,6 +2,7 @@
 
 import { writeClient, client } from '@/app/lib/sanity'
 import { Resend } from 'resend'
+import { isValidEmail, normalizeEmail } from '@/app/lib/email'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -20,11 +21,27 @@ export async function submitNotificationInterest(
   formData: NotificationInterestData
 ): Promise<SubmitNotificationInterestResult> {
   try {
+    // Guard before use — this ran straight into .toLowerCase() on the email,
+    // which throws when the field is missing
+    if (!formData.name?.trim()) {
+      return {
+        success: false,
+        message: 'Please enter your name.',
+      }
+    }
+
+    if (!isValidEmail(formData.email)) {
+      return {
+        success: false,
+        message: 'Please enter a valid email address.',
+      }
+    }
+
     // Check if email already exists for this programme
     const existingEntry = await client.fetch(
       `*[_type == "notificationInterest" && email == $email && programme == $programme][0]`,
       {
-        email: formData.email.toLowerCase().trim(),
+        email: normalizeEmail(formData.email),
         programme: formData.programme || 'cgcp-on-africa'
       }
     )
@@ -40,7 +57,7 @@ export async function submitNotificationInterest(
     await writeClient.create({
       _type: 'notificationInterest',
       name: formData.name.trim(),
-      email: formData.email.toLowerCase().trim(),
+      email: normalizeEmail(formData.email),
       programme: formData.programme || 'cgcp-on-africa',
       submittedAt: new Date().toISOString(),
       notified: false,
